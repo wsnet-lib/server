@@ -1,0 +1,35 @@
+{
+  "name": "gws-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node .",
+    "dev": "nodemon -q"
+  },
+  "engines": {
+    "node": "12.x"
+  },
+  "private": true,
+  "keywords": [
+    "node"
+  ],
+  "author": "GMI",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gamemakernet/test"
+  },
+  "dependencies": {
+    "ws": "^1.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.2.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "nodemon": "^2.0.4"
+  }
+}
