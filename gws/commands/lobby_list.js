@@ -9,11 +9,11 @@ exports.handler = (client) => {
   const lobbies = getLobbies()
 
   // Calculate the payload size
-  const size = lobbies.reduce((size, lobby) => (size + lobby.name.length + 6), 0)
+  const size = lobbies.reduce((size, lobby) => (size + lobby.name.length + 7), 0)
 
   // Write the response buffer
   const payload = Buffer.alloc(1 + size)
-  let offset = 0;
+  let offset = 0
 
   payload.writeUInt8(commandIds.lobby_list, offset++)
 
@@ -21,8 +21,8 @@ exports.handler = (client) => {
     payload.writeUInt32LE(lobby.id, offset)
     offset += 4
 
-    payload.write(lobby.name)
-    offset += lobby.name.length
+    payload.write(lobby.name + '\0');
+    offset += lobby.name.length + 1
 
     payload.writeUInt8(lobby.players.length, offset++)
 
