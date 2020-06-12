@@ -1,3 +1,4 @@
+const { commandIds } = require('./index')
 const { createLobby } = require('../lobbies')
 
 /**
@@ -7,7 +8,7 @@ const { createLobby } = require('../lobbies')
 exports.handler = (client, data) => {
   // Get the lobby name
   const nullCharIndex = data.indexOf(0)
-  const lobbyName = data.slice(2, nullCharIndex).toString()
+  const lobbyName = data.slice(1, nullCharIndex).toString()
 
   // Get the max players
   const maxPlayers = data.readUInt8(nullCharIndex + 1)
@@ -19,7 +20,14 @@ exports.handler = (client, data) => {
   const lobbyId = createLobby(lobbyName, maxPlayers, adminName)
 
   // Send the response
-  const payload = Buffer.alloc(1)
+  const payload = Buffer.alloc(2)
+  payload.writeUInt8(commandIds.lobby_create)
   payload.writeUInt8(lobbyId)
   client.send(payload)
 }
+
+/**
+interface Response {
+  commandId       u8
+  lobbyId         u8
+*/

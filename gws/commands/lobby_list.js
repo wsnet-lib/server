@@ -1,3 +1,4 @@
+const { commandIds } = require('./index')
 const { getLobbies } = require('../lobbies')
 
 /**
@@ -11,8 +12,10 @@ exports.handler = (client) => {
   const size = lobbies.reduce((size, lobby) => (size + lobby.name.length + 6), 0)
 
   // Write the response buffer
-  const payload = Buffer.alloc(size)
-  let offset = 0
+  const payload = Buffer.alloc(1 + size)
+  let offset = 0;
+
+  payload.writeUInt8(commandIds.lobby_list, offset++)
 
   lobbies.forEach(lobby => {
     payload.writeUInt32LE(lobby.id, offset)
@@ -34,6 +37,7 @@ exports.handler = (client) => {
 
 /**
 interface Response {
+  commandId       u8
   id              u32
   name            string
   playersCount    u8
