@@ -20,10 +20,12 @@ exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, sendE
   response.writeUInt8(newAdminId);
   sendBroadcast(response);
 
+  /*
   // Send the confirmation
   const confirm = Buffer.alloc(1);
   confirm.writeUInt8(commandId);
   client.send(confirm);
+  */
 };
 
 /**
