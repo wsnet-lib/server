@@ -1,3 +1,4 @@
+const { errors } = require('../errors');
 
 const commandIds = {
   lobby_list: 0,
@@ -9,10 +10,12 @@ const commandIds = {
   lobby_transfer: 6,
   lobby_max_players: 7,
   lobby_start_game: 8,
-  game_message: 9
-}
+  game_message: 9,
+  error: 10,
+  lobby_join_auto: 11
+};
 
-const commands = [
+const commandHandlers = [
   require('./lobby_list').handler,
   require('./lobby_create').handler,
   require('./lobby_join').handler,
@@ -22,13 +25,29 @@ const commands = [
   require('./lobby_transfer').handler,
   require('./lobby_max_players').handler,
   require('./lobby_start_game').handler,
-  require('./game_message').handler
-]
+  require('./game_message').handler,
+  null, // Errors
+  require('./lobby_join_auto').handler
+];
 
-/** Command id **/
+/** Command IDs */
 exports.commandIds = commandIds;
 
-/** Execute the method based on the payload event ID */
-exports.execMethod = (client, data) => {
-  commands[data.readUInt8(0)](client, data)
-}
+/** Command handlers */
+exports.commandHandlers = commandHandlers;
+
+/** Execute the command based on the payload event ID */
+exports.execCommand = (client, data) => {
+  const command = commandHandlers[data.readUInt8(0)];
+
+  // Send an error if the command does not exists
+  if (!command) {
+    const payload = Buffer.alloc(3);
+    payload.writeUInt8(commandIds.error);
+    payload.writeUInt16LE(errors.commandNotFound);
+    return client.send(payload);
+  }
+
+  // Execute the command
+  command(client, data);
+};

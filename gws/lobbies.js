@@ -1,35 +1,45 @@
-/** LOBBY INTERFACE
- *
- * {
+/**
+ * interface Lobby {
  *  id: number
  *  name: string
  *  players: Player[]
  *  maxPlayers: number
+ *  password?: string
  * }
  */
 
-/** Lobbies list */
-const lobbies = []
-let lobbyAutoIncrement = 0
+/** Lobby list */
+const lobbies = [];
+
+/** Lobby Increment ID */
+let lobbyAutoIncrement = 0;
 
 /**
  * Get the lobbies list
  * @return Lobby[]
  */
-exports.getLobbies = () => lobbies
+exports.getLobbies = () => lobbies;
 
-/** Create a lobby, if not already in a lobby
+/**
+ * Create a lobby, if not already in a lobby
+ *
+ * @param {String} lobbyName
  * @param {Number} maxPlayers
+ * @param {String} username
+ * @param {String} password
+ *
+ * @return {Number} Lobby ID
  */
-exports.createLobby = (lobbyName, maxPlayers, username) => {
-  const id = lobbyAutoIncrement++
+exports.createLobby = (lobbyName, maxPlayers, username, password) => {
+  const id = lobbyAutoIncrement++;
 
   lobbies.push({
     id,
     name: lobbyName,
     players: [{ id: 0, username }],
-    maxPlayers
-  })
+    maxPlayers,
+    password
+  });
 
-  return id
-}
+  return id;
+};

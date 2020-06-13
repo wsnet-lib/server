@@ -1,13 +1,11 @@
-/** 
+/**
 interface Input {
-  commandId       u8
-  receiver_id     u8
-  payload_to_forward     
-*/
+  commandId           u8
+  receiver_id         u8
+  payloadToForward    any
 
-/** out
-interface Response {
-  commandId       u8
-  sender_id       u8
-  payload_to_forward       
+interface Output {
+  commandId           u8
+  sender_id           u8
+  payloadToForward    any
 */

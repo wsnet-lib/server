@@ -1,75 +1,75 @@
-const WebSocket = require('ws')
-const { execMethod } = require('./commands')
+const WebSocket = require('ws');
+const { execCommand } = require('./commands');
 
 /** WebSocket.Server */
-let server
+let server;
 
 /** Get the server instance */
-exports.getServer = () => server
+exports.getServer = () => server;
 
 /* Set the user connection to alive after a pong event */
 function heartbeat() {
-  this.isAlive = true
+  this.isAlive = true;
 }
 
 /** Start the server */
 exports.start = (options = {}) => {
-  // const isServerBehindProxy = options.proxy // @TODO: v1.0
-  const onClientConnection = options.onClientConnection
-  const onClientError = options.onClientError || console.error
+  // const isServerBehindProxy = options.proxy // @TODO: Update v1.0
+  const onClientConnection = options.onClientConnection;
+  const onClientError = options.onClientError || console.error;
 
   server = new WebSocket.Server({
     port: options.port || 8080
-  })
+  });
 
   server.on('connection', (client, req) => {
     // Client game state
-    client.state = {}
+    client.state = {};
 
     // Handle the pong event
-    client.isAlive = true
-    client.on('pong', heartbeat)
+    client.isAlive = true;
+    client.on('pong', heartbeat);
 
     client.on('error', (error) => {
-      onClientError(error)
-      client.terminate()
-    })
+      onClientError(error);
+      client.terminate();
+    });
 
     client.on('message', (data) => {
       try {
-        execMethod(client, data)
+        execCommand(client, data);
       } catch (err) {
-        onClientError(err)
+        onClientError(err);
       }
-    })
+    });
 
     // Get the user IP
-    // @TODO: v1.0
+    // @TODO: Update v1.0
     // const userIp = isServerBehindProxy ? req.headers['x-forwarded-for'].split(/\s*,\s*/)[0] : req.socket.remoteAddress
 
-    onClientConnection && onClientConnection(client, req)
-  })
+    onClientConnection && onClientConnection(client, req);
+  });
 
   // Ping handler
   const interval = setInterval(() => {
-    const clients = server.clients
+    const clients = server.clients;
     for (let i = 0; i < clients.length; i++) {
-      const client = clients[i]
-      if (!client.isAlive) return client.terminate()
-      client.isAlive = false
-      client.ping()
+      const client = clients[i];
+      if (!client.isAlive) return client.terminate();
+      client.isAlive = false;
+      client.ping();
     }
-  }, options.pingInterval || 30000)
+  }, options.pingInterval || 30000);
 
   server.on('close', () => {
-    clearInterval(interval)
-    options.onClose && options.onClose()
-  })
+    clearInterval(interval);
+    options.onClose && options.onClose();
+  });
 
   server.on('listening', () => {
-    // @TODO: v1.0
-    options.onListen && options.onListen({ /* address: server.address() */ })
-  })
+    // @TODO: Update v1.0
+    options.onListen && options.onListen({ /* address: server.address() */ });
+  });
 
-  server.on('error', options.onServerError || console.error)
-}
+  server.on('error', options.onServerError || console.error);
+};

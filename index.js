@@ -1,8 +1,9 @@
-const { start } = require('./gws')
+const { start } = require('./gws');
 
+// Start the server
 start({
   port: process.env.PORT,
   onListen() {
-    console.info('[SERVER] Ready')
+    console.info('[SERVER] Ready');
   }
-})
+});

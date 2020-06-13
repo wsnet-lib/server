@@ -3,7 +3,7 @@
     "node": true,
     "browser": true
   },
-  "extends": "standard",
+  "extends": "semistandard",
   "rules": {
     "space-before-function-paren": 0
   }
