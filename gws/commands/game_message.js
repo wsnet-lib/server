@@ -32,10 +32,6 @@ exports.handler = ({ client, data, lobby, state, commandId, sendBroadcast, sendE
     receiver.send(response);
   }
 
-  // Send the confirm to the sender
-  const confirm = Buffer.alloc(1);
-  confirm.writeUInt8(commandId);
-  client.send(confirm);
 };
 
 /**

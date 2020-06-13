@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const { errors } = require('../lib/errors');
 const { createLobby } = require('../models/lobby');
 
 /**
@@ -31,8 +32,9 @@ exports.handler = async ({ data, state, client, commandId }) => {
   state.lobby = lobby;
 
   // Send the response
-  const payload = Buffer.alloc(2);
+  const payload = Buffer.alloc(3);
   payload.writeUInt8(commandId);
+  payload.writeUInt8(errors.noError);
   payload.writeUInt8(lobby.id);
   client.send(payload);
 };

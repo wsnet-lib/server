@@ -1,31 +1,33 @@
-const { errors } = require('../lib/errors');
+const { errors } = require('../lib/errors'); 
+const { commandIds } = require('../lib/commands');
 
 /**
  * Transfer the lobby ownership to another player
  */
-exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, sendError }) => {
+exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confirmError }) => {
   // Get the new admin ID
   const newAdminId = data.readUInt8(1);
 
   // Lobby check
-  if (!lobby) return sendError(errors.lobbyNotFound);
-  if (lobby.adminId !== state.id) return sendError(errors.unauthorized);
+  if (!lobby) return confirmError(errors.lobbyNotFound);
+  if (lobby.adminId !== state.id) return confirmError(errors.unauthorized);
 
   // Set the lobby admin
   lobby.adminId = newAdminId;
 
+  // confirm the new_admin change
+  const response = Buffer.alloc(3); 
+  response.writeUInt8(commandId); 
+  response.writeUInt8(errors.noError);
+  response.writeUInt8(newAdminId); 
+  client.send(response);
+
   // Broadcast the new admin to all players
   const response = Buffer.alloc(2);
-  response.writeUInt8(commandId);
+  response.writeUInt8(commandIds.lobby_transfer_changed);
   response.writeUInt8(newAdminId);
   sendBroadcast(response);
 
-  /*
-  // Send the confirmation
-  const confirm = Buffer.alloc(1);
-  confirm.writeUInt8(commandId);
-  client.send(confirm);
-  */
 };
 
 /**

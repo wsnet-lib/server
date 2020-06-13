@@ -6,7 +6,7 @@ const { getLobby } = require('../models/lobby');
 /**
  * Join a lobby
  */
-exports.handler = async ({ client, data, state, commandId, sendBroadcast, sendError }) => {
+exports.handler = async ({ client, data, state, commandId, sendBroadcast, confirmError }) => {
   // Get the input
   const lobbyId = data.readUInt32LE(1);
   const nullCharIndex = data.indexOf(0, 5);
@@ -15,17 +15,17 @@ exports.handler = async ({ client, data, state, commandId, sendBroadcast, sendEr
 
   // Lobby check
   const lobby = getLobby(lobbyId);
-  if (!lobby) return sendError(errors.lobbyNotFound);
+  if (!lobby) return confirmError(errors.lobbyNotFound);
   const { password: lobbyPassword, players, maxPlayers, freeIds } = lobby;
 
   // Max players check
   if (players.length >= maxPlayers || !freeIds.length) {
-    return sendError(errors.lobbyJoinNotFound);
+    return confirmError(errors.lobbyJoinNotFound);
   }
 
   // Password check, if needed
   if (lobbyPassword && !await bcrypt.compare(inputLobbyPassword, lobbyPassword)) {
-    return sendError(errors.wrongPassword);
+    return confirmError(errors.wrongPassword);
   }
 
   // Add the player to the lobby
@@ -36,9 +36,10 @@ exports.handler = async ({ client, data, state, commandId, sendBroadcast, sendEr
   players.push(client);
 
   // Build the sender response
-  const size = 7 + players.reduce((size, player) => (size + player.state.username.length + 2), 0);
+  const size = 8 + players.reduce((size, player) => (size + player.state.username.length + 2), 0);
   const senderResponse = Buffer.alloc(size);
   senderResponse.writeUInt8(commandId);
+  senderResponse.writeUInt8(errors.noError);
   senderResponse.writeUInt32LE(lobbyId);
   senderResponse.writeUInt8(players.length);
   senderResponse.writeUInt8(playerId);

@@ -5,7 +5,7 @@ const { findLobby } = require('../models/lobby');
 /**
  * Auto join a lobby
  */
-exports.handler = async ({ client, data, state, commandId, sendBroadcast, sendError }) => {
+exports.handler = async ({ client, data, state, commandId, sendBroadcast, confirmError }) => {
   // Get the input
   const dateSort = data.readUInt8(1);
   const maxPlayersSort = data.readUInt8(2);
@@ -13,7 +13,7 @@ exports.handler = async ({ client, data, state, commandId, sendBroadcast, sendEr
 
   // Get the first available lobby
   const lobby = findLobby(dateSort, maxPlayersSort);
-  if (!lobby) return sendError(errors.lobbyJoinNotFound);
+  if (!lobby) return confirmError(errors.lobbyJoinNotFound);
   const { players, freeIds } = lobby;
 
   // Add the player to the lobby
@@ -24,9 +24,10 @@ exports.handler = async ({ client, data, state, commandId, sendBroadcast, sendEr
   players.push(client);
 
   // Build the sender response
-  const size = 7 + players.reduce((size, player) => (size + player.state.username.length + 2), 0);
+  const size = 8 + players.reduce((size, player) => (size + player.state.username.length + 2), 0);
   const senderResponse = Buffer.alloc(size);
   senderResponse.writeUInt8(commandId);
+  senderResponse.writeUInt8(errors.noError);
   senderResponse.writeUInt32LE(lobby.id);
   senderResponse.writeUInt8(players.length);
   senderResponse.writeUInt8(playerId);

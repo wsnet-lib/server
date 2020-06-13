@@ -5,15 +5,15 @@ const { deleteLobby } = require('../models/lobby');
 /**
  * Kick or ban a player
  */
-exports.handler = ({ client, lobby, state, commandId, sendBroadcast, sendConfirm, sendError }) => {
+exports.handler = ({ client, lobby, state, commandId, sendBroadcast, sendConfirm, confirmError }) => {
   // Lobby check
-  if (!lobby) return sendError(errors.lobbyNotFound);
+  if (!lobby) return confirmError(errors.lobbyNotFound);
 
   // Remove the player from the lobby
   const { players } = lobby;
   const { id: playerId } = client;
   const playerLobbyIdx = players.findIndex(player => player.state.id === playerId);
-  if (!playerLobbyIdx) return sendError(errors.playerNotFound);
+  if (!playerLobbyIdx) return confirmError(errors.playerNotFound);
   players.splice(playerLobbyIdx, 1);
   lobby.freeIds.push(playerId);
 

@@ -12,9 +12,13 @@ const commandIds = {
   lobby_leave: 7,
   lobby_player_left: 8,
   lobby_transfer: 9,
-  lobby_allow_join: 10,
-  lobby_max_players: 11,
-  lobby_kick: 12
+  lobby_transfer_changed: 10,
+  lobby_allow_join: 11,
+  lobby_allow_join_changed: 12,
+  lobby_max_players: 13,
+  lobby_max_players_changed: 14,
+  lobby_kick: 15,
+  lobby_player_kicked: 16
 };
 
 /** Command IDs */
@@ -31,12 +35,23 @@ exports.execCommand = (server, client, data) => {
   const command = commandHandlers[commandId];
 
   /**
-   * Send an error to the sender
+   * Send an error to the sender using the error commandId
    * @param {Number} errorId
    */
   const sendError = (errorId) => {
     const errorResp = Buffer.alloc(2);
     errorResp.writeUInt8(commandIds.error);
+    errorResp.writeUInt8(errorId);
+    client.send(errorResp);
+  };
+
+   /**
+   * Send an error to the sender using the incoming commandId
+   * @param {Number} errorId
+   */
+  const confirmError = (errorId) => {
+    const errorResp = Buffer.alloc(2);
+    errorResp.writeUInt8(commandId);
     errorResp.writeUInt8(errorId);
     client.send(errorResp);
   };
@@ -53,13 +68,15 @@ exports.execCommand = (server, client, data) => {
     commandId,
     lobby: client.state.lobby,
     sendError,
+    confirmError,
 
     /**
      * Send the confirmation to the sender
      */
     sendConfirm: () => {
-      const confirm = Buffer.alloc(1);
+      const confirm = Buffer.alloc(2);
       confirm.writeUInt8(commandId);
+      confirm.writeUInt8(errors.noError);
       client.send(confirm);
     },
 
@@ -70,5 +87,6 @@ exports.execCommand = (server, client, data) => {
     sendBroadcast: (response) => {
       client.lobby.players.forEach(player => client !== player && player.send(response));
     }
+ 
   });
 };

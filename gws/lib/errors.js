@@ -6,7 +6,8 @@ exports.errors = {
   unauthorized: 4,
   wrongPassword: 5,
   maxLobbyPlayers: 6,
-  inputValidationFailed: 7
+  inputValidationFailed: 7,
+  noError : 255
 };
 
 /**
