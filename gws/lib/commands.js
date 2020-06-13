@@ -10,7 +10,6 @@ const commandIds = {
   lobby_kick: 5,
   lobby_transfer: 6,
   lobby_max_players: 7,
-  lobby_start_game: 8,
   game_message: 9,
   error: 10,
   lobby_join_auto: 11
@@ -29,13 +28,19 @@ exports.execCommand = (server, client, data) => {
   const commandId = data.readUInt8(0);
   const command = commandHandlers[commandId];
 
+  /**
+   * Send an error to the sender
+   * @param {Number} errorId
+   */
+  const sendError = (errorId) => {
+    const errorResp = Buffer.alloc(2);
+    errorResp.writeUInt8(commandIds.error);
+    errorResp.writeUInt8(errorId);
+    client.send(errorResp);
+  };
+
   // Send an error if the command does not exists
-  if (!command) {
-    const payload = Buffer.alloc(3);
-    payload.writeUInt8(commandIds.error);
-    payload.writeUInt16LE(errors.commandNotFound);
-    return client.send(payload);
-  }
+  if (!command) return sendError(errors.commandNotFound);
 
   // Execute the command
   command(
@@ -52,16 +57,14 @@ exports.execCommand = (server, client, data) => {
     /** @type {Response} */
     {
       send: client.send.bind(client),
+      sendError,
 
       /**
-       * Send an error to the sender
-       * @param {Number} errorId
+       * Broadcast the message to all lobby clients, except the sender one.
+       * @param {Buffer} response
        */
-      sendError: (errorId) => {
-        const errorResp = Buffer.alloc(3);
-        errorResp.writeUInt8(commandIds.error);
-        errorResp.writeUInt16LE(errorId);
-        client.send(errorResp);
+      broadcast: (response) => {
+        client.lobby.players.forEach(player => client !== player && player.send(response));
       }
     }
   );

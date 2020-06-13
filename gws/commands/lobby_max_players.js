@@ -1,16 +1,15 @@
 const { errors } = require('../lib/errors');
 
 /**
- * Set the
- * @param {Request} req
- * @param {Response} res
+ * Set the max players lobby flag
  */
-exports.handler = ({ data, lobby, commandId }, { send, sendError }) => {
+exports.handler = ({ client, data, lobby, commandId }, { send, sendError }) => {
   // Get the input
   const maxPlayers = data.readUInt8(2);
 
-  // Get the players list
+  // Lobby check
   if (!lobby) return sendError(errors.lobbyNotFound);
+  if (lobby.adminId !== client.id) return sendError(errors.unauthorized);
 
   // Set the flag
   lobby.maxPlayers = maxPlayers;
@@ -27,4 +26,5 @@ interface Input {
 
 interface Output {
   commandId           u8
+}
 */

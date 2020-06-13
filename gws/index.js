@@ -18,7 +18,7 @@ function heartbeat() {
  * @param {Object=} options
  */
 exports.start = (options = {}) => {
-  // const isServerBehindProxy = options.proxy // @TODO: Update v1.0
+  const isServerBehindProxy = options.proxy;
   const onClientConnection = options.onClientConnection;
   const onClientError = options.onClientError || console.error;
 
@@ -28,10 +28,12 @@ exports.start = (options = {}) => {
 
   server.on('connection', (client, req) => {
     /**
-     * Client game state
+     * Client player state
      * @type {ClientState}
      */
-    client.state = {};
+    client.state = {
+      ip: isServerBehindProxy ? req.headers['x-forwarded-for'].split(/\s*,\s*/)[0] : req.socket.remoteAddress
+    };
 
     // Handle the pong event
     client.isAlive = true;
@@ -49,10 +51,6 @@ exports.start = (options = {}) => {
         onClientError(err);
       }
     });
-
-    // Get the user IP
-    // @TODO: Update v1.0
-    // const userIp = isServerBehindProxy ? req.headers['x-forwarded-for'].split(/\s*,\s*/)[0] : req.socket.remoteAddress
 
     onClientConnection && onClientConnection(client, req);
   });
@@ -74,8 +72,8 @@ exports.start = (options = {}) => {
   });
 
   server.on('listening', () => {
-    // @TODO: Update v1.0
-    options.onListen && options.onListen({ /* address: server.address() */ });
+    const info = server.address();
+    options.onListen && options.onListen({ address: `${info.address}:${info.port}` });
   });
 
   server.on('error', options.onServerError || console.error);

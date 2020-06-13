@@ -53,6 +53,7 @@ exports.createLobby = (lobbyName, maxPlayers, client, password) => {
     id,
     name: lobbyName,
     players: [client],
+    adminId: 0,
     freeIds,
     maxPlayers,
     password,

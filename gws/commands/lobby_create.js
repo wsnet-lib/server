@@ -2,8 +2,6 @@ const { createLobby } = require('../models/lobby');
 
 /**
  * Create a lobby
- * @param {Object<Request>} req
- * @param {Object<Response>} res
  */
 exports.handler = ({ data, state, client, commandId }, { send }) => {
   // Get the lobby name

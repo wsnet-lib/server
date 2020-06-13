@@ -7,7 +7,7 @@ const commandHandlers = [
   require('./lobby_kick').handler,
   require('./lobby_transfer').handler,
   require('./lobby_max_players').handler,
-  require('./lobby_start_game').handler,
+  null, // Removed command
   require('./game_message').handler,
   null, // Errors
   require('./lobby_join_auto').handler
