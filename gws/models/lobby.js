@@ -56,7 +56,7 @@ exports.createLobby = (lobbyName, maxPlayers, client, password) => {
     freeIds,
     maxPlayers,
     password,
-    locked: false
+    allowJoin: true
   };
   lobbies.push(lobby);
   return lobby;
