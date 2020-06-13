@@ -5,7 +5,7 @@ const { getLobbies } = require('../models/lobby');
  * @param {Object<Request>} req
  * @param {Object<Response>} res
  */
-exports.handler = ({ commandId }, { send }) => {
+exports.handler = ({ client, commandId }) => {
   // Get the lobbies
   const lobbies = getLobbies();
 
@@ -36,7 +36,7 @@ exports.handler = ({ commandId }, { send }) => {
   });
 
   // Send the response
-  send(payload);
+  client.send(payload);
 };
 
 /**

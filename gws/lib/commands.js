@@ -43,29 +43,30 @@ exports.execCommand = (server, client, data) => {
   if (!command) return sendError(errors.commandNotFound);
 
   // Execute the command
-  command(
-    /** @type {Request} */
-    {
-      data,
-      server,
-      client,
-      state: client.state,
-      commandId,
-      lobby: client.state.lobby
+  command({
+    data,
+    server,
+    client,
+    state: client.state,
+    commandId,
+    lobby: client.state.lobby,
+    sendError,
+
+    /**
+       * Send the confirmation to the sender
+       */
+    sendConfirm: () => {
+      const confirm = Buffer.alloc(1);
+      confirm.writeUInt8(commandId);
+      client.send(confirm);
     },
 
-    /** @type {Response} */
-    {
-      send: client.send.bind(client),
-      sendError,
-
-      /**
-       * Broadcast the message to all lobby clients, except the sender one.
-       * @param {Buffer} response
-       */
-      broadcast: (response) => {
-        client.lobby.players.forEach(player => client !== player && player.send(response));
-      }
+    /**
+         * Broadcast the message to all lobby clients, except the sender one.
+         * @param {Buffer} response
+         */
+    sendBroadcast: (response) => {
+      client.lobby.players.forEach(player => client !== player && player.send(response));
     }
-  );
+  });
 };

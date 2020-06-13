@@ -3,7 +3,7 @@ const { errors } = require('../lib/errors');
 /**
  * Transfer the lobby ownership to another player
  */
-exports.handler = ({ client, data, lobby, commandId }, { send, broadcast, sendError }) => {
+exports.handler = ({ client, data, lobby, commandId, sendBroadcast, sendError }) => {
   // Get the new admin ID
   const newAdminId = data.readUInt8(1);
 
@@ -18,12 +18,12 @@ exports.handler = ({ client, data, lobby, commandId }, { send, broadcast, sendEr
   const response = Buffer.alloc(2);
   response.writeUInt8(commandId);
   response.writeUInt8(newAdminId);
-  broadcast(response);
+  sendBroadcast(response);
 
   // Send the confirmation
   const confirm = Buffer.alloc(1);
   confirm.writeUInt8(commandId);
-  send(confirm);
+  client.send(confirm);
 };
 
 /**

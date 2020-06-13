@@ -1,19 +1,19 @@
 /**
  * interface Lobby {
- *  id: number
- *  name: string
+ *  id: Number
+ *  name: String
+ *  adminId: Number
+ *  freeIds: Number[]
  *  players: Player[]
- *  maxPlayers: number
- *  password?: string
- *  locked: boolean
+ *  maxPlayers: Number
+ *  password?: String
+ *  allowJoin: Boolean
+ *  bans: Object<Bans>
  * }
  */
 
-/**
- * Lobby list
- * @type {Array.<Lobby>} lobbies
- */
-const lobbies = [];
+/** Lobby list */
+const lobbies = {};
 
 /** Lobby Increment ID */
 let lobbyAutoIncrement = 0;
@@ -30,6 +30,14 @@ exports.getLobbies = () => lobbies;
  * @return Lobby
  */
 exports.getLobby = (id) => lobbies[id];
+
+/**
+ * Delete a lobby
+ * @param {Number} id
+ */
+exports.deleteLobby = (id) => {
+  delete lobbies[id];
+};
 
 /**
  * Create a lobby, if not already in a lobby
@@ -57,8 +65,9 @@ exports.createLobby = (lobbyName, maxPlayers, client, password) => {
     freeIds,
     maxPlayers,
     password,
-    allowJoin: true
+    allowJoin: true,
+    bans: {}
   };
-  lobbies.push(lobby);
+  lobbies[id] = lobby;
   return lobby;
 };

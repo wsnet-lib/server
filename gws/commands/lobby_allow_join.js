@@ -3,7 +3,7 @@ const { errors } = require('../lib/errors');
 /**
  * Set the allow join lobby flag
  */
-exports.handler = ({ client, data, lobby, commandId }, { send, sendError }) => {
+exports.handler = ({ client, data, lobby, commandId, sendError }) => {
   // Get the input
   const allowJoin = data.readUInt8(2);
 
@@ -14,8 +14,10 @@ exports.handler = ({ client, data, lobby, commandId }, { send, sendError }) => {
   // Set the flag
   lobby.allowJoin = allowJoin;
 
-  // Send the confirmation
-  send(Buffer.alloc(1).writeUInt8(commandId));
+  // Send the confirm to the sender
+  const confirm = Buffer.alloc(1);
+  confirm.writeUInt8(commandId);
+  client.send(confirm);
 };
 
 /**

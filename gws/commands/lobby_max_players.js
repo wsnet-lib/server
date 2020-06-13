@@ -3,7 +3,7 @@ const { errors } = require('../lib/errors');
 /**
  * Set the max players lobby flag
  */
-exports.handler = ({ client, data, lobby, commandId }, { send, sendError }) => {
+exports.handler = ({ client, data, lobby, sendConfirm, sendError }) => {
   // Get the input
   const maxPlayers = data.readUInt8(2);
 
@@ -14,8 +14,8 @@ exports.handler = ({ client, data, lobby, commandId }, { send, sendError }) => {
   // Set the flag
   lobby.maxPlayers = maxPlayers;
 
-  // Send the confirmation
-  send(Buffer.alloc(1).writeUInt8(commandId));
+  // Send the confirmation to the sender
+  sendConfirm();
 };
 
 /**

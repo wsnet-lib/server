@@ -3,7 +3,7 @@ const { createLobby } = require('../models/lobby');
 /**
  * Create a lobby
  */
-exports.handler = ({ data, state, client, commandId }, { send }) => {
+exports.handler = ({ data, state, client, commandId }) => {
   // Get the lobby name
   let nullCharIndex = data.indexOf(0);
   const lobbyName = data.slice(1, nullCharIndex).toString();
@@ -32,7 +32,7 @@ exports.handler = ({ data, state, client, commandId }, { send }) => {
   const payload = Buffer.alloc(2);
   payload.writeUInt8(commandId);
   payload.writeUInt8(lobby.id);
-  send(payload);
+  client.send(payload);
 };
 
 /**

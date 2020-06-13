@@ -3,7 +3,7 @@ const { errors } = require('../lib/errors');
 /**
  * Send or broadcast a generic message
  */
-exports.handler = ({ client, data, lobby, state, commandId }, { send, broadcast, sendError }) => {
+exports.handler = ({ client, data, lobby, state, commandId, sendBroadcast, sendError }) => {
   // Get the receiverId
   const receiverId = data.readUInt8(1);
 
@@ -20,12 +20,12 @@ exports.handler = ({ client, data, lobby, state, commandId }, { send, broadcast,
   // Broadcast or send the message
   if (receiverId === 255) {
     // Broadcast the message to the lobby players
-    broadcast(response);
+    sendBroadcast(response);
 
-    // Send the confirm to the user
+    // Send the confirm to the sender
     const confirm = Buffer.alloc(1);
     confirm.writeUInt8(commandId);
-    send(confirm);
+    client.send(confirm);
   } else {
     // Find the receiver player
     const receiver = players.find(player => player.id === receiverId);
