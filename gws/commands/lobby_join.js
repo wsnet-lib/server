@@ -77,7 +77,7 @@ interface SenderOutput {
 }
 
 interface BroadcastOutput {
-  commandId           u8
+  lobby_player_joined u8
   playerId            u8
   playerName          string
 */
