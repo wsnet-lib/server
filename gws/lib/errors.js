@@ -1,5 +1,7 @@
 exports.errors = {
-  commandNotFound: 0
+  commandNotFound: 0,
+  playerNotFound: 1,
+  lobbyNotFound: 2
 };
 
 /**

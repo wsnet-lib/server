@@ -1,10 +1,12 @@
 const WebSocket = require('ws');
-const { execCommand } = require('./commands');
+const { execCommand } = require('./lib/commands');
 
-/** WebSocket.Server */
+/** @type {WebSocket.Server} */
 let server;
 
-/** Get the server instance */
+/** Get the server instance
+ * @return {WebSocket.Server}
+ */
 exports.getServer = () => server;
 
 /* Set the user connection to alive after a pong event */
@@ -12,7 +14,9 @@ function heartbeat() {
   this.isAlive = true;
 }
 
-/** Start the server */
+/** Start the server
+ * @param {Object=} options
+ */
 exports.start = (options = {}) => {
   // const isServerBehindProxy = options.proxy // @TODO: Update v1.0
   const onClientConnection = options.onClientConnection;
@@ -23,7 +27,10 @@ exports.start = (options = {}) => {
   });
 
   server.on('connection', (client, req) => {
-    // Client game state
+    /**
+     * Client game state
+     * @type {ClientState}
+     */
     client.state = {};
 
     // Handle the pong event
@@ -37,7 +44,7 @@ exports.start = (options = {}) => {
 
     client.on('message', (data) => {
       try {
-        execCommand(client, data);
+        execCommand(server, client, data);
       } catch (err) {
         onClientError(err);
       }

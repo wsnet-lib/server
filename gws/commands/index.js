@@ -1,6 +1,3 @@
-const { errors } = require('../errors');
-const { commandIds } = require('../commandIds');
-
 const commandHandlers = [
   require('./lobby_list').handler,
   require('./lobby_create').handler,
@@ -18,19 +15,3 @@ const commandHandlers = [
 
 /** Command handlers */
 exports.commandHandlers = commandHandlers;
-
-/** Execute the command based on the payload event ID */
-exports.execCommand = (client, data) => {
-  const command = commandHandlers[data.readUInt8(0)];
-
-  // Send an error if the command does not exists
-  if (!command) {
-    const payload = Buffer.alloc(3);
-    payload.writeUInt8(commandIds.error);
-    payload.writeUInt16LE(errors.commandNotFound);
-    return client.send(payload);
-  }
-
-  // Execute the command
-  command(client, data);
-};

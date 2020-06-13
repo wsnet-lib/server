@@ -1,11 +1,11 @@
-const { commandIds } = require('.');
-const { getLobbies } = require('../lobbies');
+const { getLobbies } = require('../models/lobby');
 
 /**
  * Get the lobbies list
- * @param {WebSocket} client
+ * @param {Object<Request>} req
+ * @param {Object<Response>} res
  */
-exports.handler = (client) => {
+exports.handler = ({ commandId }, { send }) => {
   // Get the lobbies
   const lobbies = getLobbies();
 
@@ -17,7 +17,7 @@ exports.handler = (client) => {
   let offset = 0;
 
   // Command ID
-  payload.writeUInt8(commandIds.lobby_list, offset++);
+  payload.writeUInt8(commandId, offset++);
 
   lobbies.forEach(lobby => {
     // Lobby ID
@@ -35,10 +35,8 @@ exports.handler = (client) => {
     payload.writeUInt8(lobby.maxPlayers, offset++);
   });
 
-  // payload.forEach(byte => console.log(byte)) // log
-
   // Send the response
-  client.send(payload);
+  send(payload);
 };
 
 /**

@@ -1,12 +1,11 @@
-const { commandIds } = require('../commandIds');
-const { createLobby } = require('../lobbies');
+const { createLobby } = require('../models/lobby');
 
 /**
  * Create a lobby
- * @param {WebSocket} client
- * @param {Buffer} data
+ * @param {Object<Request>} req
+ * @param {Object<Response>} res
  */
-exports.handler = (client, data) => {
+exports.handler = ({ data, state, client, commandId }, { send }) => {
   // Get the lobby name
   let nullCharIndex = data.indexOf(0);
   const lobbyName = data.slice(1, nullCharIndex).toString();
@@ -24,13 +23,18 @@ exports.handler = (client, data) => {
   const password = data.slice(offset, data.length - 1).toString();
 
   // Create the lobby
-  const lobbyId = createLobby(lobbyName, maxPlayers, adminName, password);
+  const lobby = createLobby(lobbyName, maxPlayers, client, password);
+
+  // Update the client state
+  state.id = 0;
+  state.username = adminName;
+  state.lobby = lobby;
 
   // Send the response
   const payload = Buffer.alloc(2);
-  payload.writeUInt8(commandIds.lobby_create);
-  payload.writeUInt8(lobbyId);
-  client.send(payload);
+  payload.writeUInt8(commandId);
+  payload.writeUInt8(lobby.id);
+  send(payload);
 };
 
 /**
