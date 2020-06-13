@@ -21,14 +21,9 @@ exports.handler = ({ client, data, lobby, state, commandId, sendBroadcast, sendE
   if (receiverId === 255) {
     // Broadcast the message to the lobby players
     sendBroadcast(response);
-
-    // Send the confirm to the sender
-    const confirm = Buffer.alloc(1);
-    confirm.writeUInt8(commandId);
-    client.send(confirm);
   } else {
     // Find the receiver player
-    const receiver = players.find(player => player.id === receiverId);
+    const receiver = players.find(player => player.state.id === receiverId);
 
     // If the receiver does not exists anymore, send an error to the sender
     if (!receiver) return sendError(errors.playerNotFound);
@@ -36,6 +31,11 @@ exports.handler = ({ client, data, lobby, state, commandId, sendBroadcast, sendE
     // Send the message to the receiver
     receiver.send(response);
   }
+
+  // Send the confirm to the sender
+  const confirm = Buffer.alloc(1);
+  confirm.writeUInt8(commandId);
+  client.send(confirm);
 };
 
 /**

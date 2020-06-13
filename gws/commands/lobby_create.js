@@ -1,9 +1,10 @@
+const bcrypt = require('bcryptjs');
 const { createLobby } = require('../models/lobby');
 
 /**
  * Create a lobby
  */
-exports.handler = ({ data, state, client, commandId }) => {
+exports.handler = async ({ data, state, client, commandId }) => {
   // Get the lobby name
   let nullCharIndex = data.indexOf(0);
   const lobbyName = data.slice(1, nullCharIndex).toString();
@@ -17,8 +18,9 @@ exports.handler = ({ data, state, client, commandId }) => {
   const adminName = data.slice(offset, nullCharIndex).toString();
   offset = nullCharIndex + 1;
 
-  // Get the password (if specified)
-  const password = data.slice(offset, data.length - 1).toString();
+  // Get the password and hash it (if specified)
+  let password = data.slice(offset, data.length - 1).toString();
+  if (password) password = await bcrypt.hash(password, 8);
 
   // Create the lobby
   const lobby = createLobby(lobbyName, maxPlayers, client, password);

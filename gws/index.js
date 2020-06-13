@@ -44,9 +44,9 @@ exports.start = (options = {}) => {
       client.terminate();
     });
 
-    client.on('message', (data) => {
+    client.on('message', async (data) => {
       try {
-        execCommand(server, client, data);
+        await execCommand(server, client, data);
       } catch (err) {
         onClientError(err);
       }

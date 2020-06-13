@@ -2,7 +2,10 @@ exports.errors = {
   commandNotFound: 0,
   playerNotFound: 1,
   lobbyNotFound: 2,
-  unauthorized: 3
+  unauthorized: 3,
+  wrongPassword: 4,
+  maxLobbyPlayers: 5,
+  inputValidationFailed: 6
 };
 
 /**

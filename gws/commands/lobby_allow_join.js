@@ -3,13 +3,13 @@ const { errors } = require('../lib/errors');
 /**
  * Set the allow join lobby flag
  */
-exports.handler = ({ client, data, lobby, commandId, sendError }) => {
+exports.handler = ({ client, state, data, lobby, commandId, sendError }) => {
   // Get the input
   const allowJoin = data.readUInt8(2);
 
   // Lobby check
   if (!lobby) return sendError(errors.lobbyNotFound);
-  if (lobby.adminId !== client.id) return sendError(errors.unauthorized);
+  if (lobby.adminId !== state.id) return sendError(errors.unauthorized);
 
   // Set the flag
   lobby.allowJoin = allowJoin;

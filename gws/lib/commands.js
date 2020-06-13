@@ -2,17 +2,19 @@ const { errors } = require('./errors');
 const { commandHandlers } = require('../commands');
 
 const commandIds = {
-  lobby_list: 0,
-  lobby_create: 1,
-  lobby_join: 2,
-  lobby_leave: 3,
-  lobby_allow_join: 4,
-  lobby_kick: 5,
-  lobby_transfer: 6,
-  lobby_max_players: 7,
-  game_message: 9,
-  error: 10,
-  lobby_join_auto: 11
+  error: 0,
+  game_message: 1,
+  lobby_list: 2,
+  lobby_create: 3,
+  lobby_join: 4,
+  lobby_join_auto: 5,
+  lobby_player_joined: 6,
+  lobby_leave: 7,
+  lobby_player_left: 8,
+  lobby_transfer: 9,
+  lobby_allow_join: 10,
+  lobby_max_players: 11,
+  lobby_kick: 12
 };
 
 /** Command IDs */
@@ -43,7 +45,7 @@ exports.execCommand = (server, client, data) => {
   if (!command) return sendError(errors.commandNotFound);
 
   // Execute the command
-  command({
+  return command({
     data,
     server,
     client,
@@ -53,8 +55,8 @@ exports.execCommand = (server, client, data) => {
     sendError,
 
     /**
-       * Send the confirmation to the sender
-       */
+     * Send the confirmation to the sender
+     */
     sendConfirm: () => {
       const confirm = Buffer.alloc(1);
       confirm.writeUInt8(commandId);
@@ -62,9 +64,9 @@ exports.execCommand = (server, client, data) => {
     },
 
     /**
-         * Broadcast the message to all lobby clients, except the sender one.
-         * @param {Buffer} response
-         */
+     * Broadcast the message to all lobby clients, except the sender one.
+     * @param {Buffer} response
+     */
     sendBroadcast: (response) => {
       client.lobby.players.forEach(player => client !== player && player.send(response));
     }

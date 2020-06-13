@@ -3,27 +3,27 @@ const { errors } = require('../lib/errors');
 /**
  * Kick or ban a player
  */
-exports.handler = ({ client, data, lobby, commandId, sendBroadcast, sendError }) => {
+exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, sendError }) => {
   // Get the input
   const kickedPlayerId = data.readUInt8(1);
   const kickOrBan = data.readUInt8(1);
 
   // Lobby check
   if (!lobby) return sendError(errors.lobbyNotFound);
-  if (lobby.adminId !== client.id) return sendError(errors.unauthorized);
+  if (lobby.adminId !== state.id) return sendError(errors.unauthorized);
 
   // Find the player
   const { players } = lobby;
 
   for (let i = 0; i < players.length; i++) {
     const player = players[i];
-    if (player.id !== kickedPlayerId) {
+    if (player.state.id !== kickedPlayerId) {
       // Kick the player
       lobby.players.splice(i, 1);
       lobby.freeIds.push(kickedPlayerId);
 
       // Add a ban for this player if specified
-      if (kickOrBan) lobby.bans[player.ip] = true;
+      if (kickOrBan) lobby.bans[player.state.ip] = true;
       break;
     }
   }
