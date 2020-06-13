@@ -10,7 +10,7 @@ exports.handler = ({ client, commandId }) => {
   const lobbies = getLobbies();
 
   // Calculate the payload size
-  const size = lobbies.reduce((size, lobby) => (size + lobby.name.length + 7), 0);
+  const size = lobbies.reduce((size, lobby) => (size + lobby.name.length + 9), 0);
 
   // Write the response buffer
   const payload = Buffer.alloc(1 + size);
@@ -33,6 +33,9 @@ exports.handler = ({ client, commandId }) => {
 
     // Max players
     payload.writeUInt8(lobby.maxPlayers, offset++);
+
+    // Has password
+    payload.writeUInt8(lobby.password ? 1 : 0, offset);
   });
 
   // Send the response
@@ -46,4 +49,5 @@ interface Output {
   name            string
   playersCount    u8
   maxPlayers      u8
+  hasPassword     u8
 */

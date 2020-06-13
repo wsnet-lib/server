@@ -10,8 +10,8 @@ exports.handler = async ({ client, data, state, commandId, sendBroadcast, sendEr
   // Get the input
   const lobbyId = data.readUInt32LE(1);
   const nullCharIndex = data.indexOf(0, 5);
-  const username = data.slice(5, nullCharIndex).toString();
-  const password = data.slice(nullCharIndex + 1).toString();
+  const inputLobbyPassword = data.slice(5, nullCharIndex).toString();
+  const username = data.slice(nullCharIndex + 1).toString();
 
   // Lobby check
   const lobby = getLobby(lobbyId);
@@ -20,11 +20,11 @@ exports.handler = async ({ client, data, state, commandId, sendBroadcast, sendEr
 
   // Max players check
   if (players.length >= maxPlayers || !freeIds.length) {
-    return sendError(errors.maxLobbyPlayers);
+    return sendError(errors.lobbyJoinNotFound);
   }
 
   // Password check, if needed
-  if (lobbyPassword && !await bcrypt.compare(password, lobbyPassword)) {
+  if (lobbyPassword && !await bcrypt.compare(inputLobbyPassword, lobbyPassword)) {
     return sendError(errors.wrongPassword);
   }
 
@@ -61,8 +61,8 @@ exports.handler = async ({ client, data, state, commandId, sendBroadcast, sendEr
 interface Input {
   commandId           u8
   lobbyId             u32
+  lobbyPassword?      string
   username            string
-  password?           string
 }
 
 interface SenderOutput {

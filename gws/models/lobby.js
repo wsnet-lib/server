@@ -66,8 +66,42 @@ exports.createLobby = (lobbyName, maxPlayers, client, password) => {
     maxPlayers,
     password,
     allowJoin: true,
-    bans: {}
+    bans: {},
+    createdAt: new Date()
   };
   lobbies[id] = lobby;
   return lobby;
+};
+
+// Cached sorting functions
+const sortByDate = (a, b) => b.createdAt - a.createdAt;
+const sortByMaxPlayers = (a, b) => b.players.length - a.players.length;
+const sortByAll = (a, b) => b.createdAt - a.createdAt || b.players.length - a.players.length;
+
+/**
+   * Find a lobby based on the sort criteria
+   *
+   * @param {Boolean} dateSort (0=disabled, 1=enabled)
+   * @param {Boolean} maxPlayersSort (0=disabled, 1=enabled)
+   *
+   * @return {Lobby}
+   */
+exports.findLobby = (dateSort, maxPlayersSort) => {
+  // Get the sorting method
+  let sortMethod;
+  if (!dateSort && !maxPlayersSort) {
+    sortMethod = undefined;
+  } else if (dateSort && !maxPlayersSort) {
+    sortMethod = sortByDate;
+  } else if (!dateSort && maxPlayersSort) {
+    sortMethod = sortByMaxPlayers;
+  } else {
+    sortMethod = sortByAll;
+  }
+
+  // Sort the lobbies
+  const sortedLobbies = Object.values(lobbies).sort(sortMethod);
+
+  // Get the first lobby not full and without a password
+  return sortedLobbies.find(lobby => lobby.players.length < lobby.maxPlayers && !lobby.password);
 };
