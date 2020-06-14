@@ -1,5 +1,5 @@
 const { errors } = require('../lib/errors');
-const { commandIds } = require('../lib/commands');
+const { commandIds } = require('../lib/commandIds');
 
 /**
  * Kick or ban a player
@@ -32,16 +32,16 @@ exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confi
   // Confirm the player kick/ban
   const response = Buffer.alloc(4);
   response.writeUInt8(commandId);
-  response.writeUInt8(errors.noError);
-  response.writeUInt8(kickedPlayerId);
-  response.writeUInt8(kickOrBan);
+  response.writeUInt8(errors.noError, 1);
+  response.writeUInt8(kickedPlayerId, 2);
+  response.writeUInt8(kickOrBan, 3);
   client.send(response);
 
   // Broadcast the kicked player to other lobby players
   const broadcastResponse = Buffer.alloc(3);
   broadcastResponse.writeUInt8(commandIds.lobby_player_kicked);
-  broadcastResponse.writeUInt8(kickedPlayerId);
-  broadcastResponse.writeUInt8(kickOrBan);
+  broadcastResponse.writeUInt8(kickedPlayerId, 1);
+  broadcastResponse.writeUInt8(kickOrBan, 2);
   sendBroadcast(broadcastResponse);
 };
 

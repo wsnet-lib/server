@@ -21,7 +21,6 @@
     "url": "https://github.com/gamemakernet/test"
   },
   "dependencies": {
-    "bcrypt": "^5.0.0",
     "ws": "7.2.1"
   },
   "devDependencies": {

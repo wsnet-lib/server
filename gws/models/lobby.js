@@ -54,7 +54,8 @@ exports.createLobby = (lobbyName, maxPlayers, client, password) => {
 
   // Create the available IDs
   const freeIds = [];
-  for (let i = 254; i > 0; i--) freeIds[i] = i;
+  for (let i = 254; i >= 0; i--) freeIds[i] = i;
+  freeIds.shift();
 
   // Push the lobby
   const lobby = {

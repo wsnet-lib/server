@@ -1,12 +1,12 @@
-const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const { errors } = require('../lib/errors');
-const { commandIds } = require('../lib/commands');
+const { commandIds } = require('../lib/commandIds');
 const { getLobby } = require('../models/lobby');
 
 /**
  * Join a lobby
  */
-exports.handler = async ({ client, data, state, commandId, sendBroadcast, confirmError }) => {
+exports.handler = ({ client, data, state, commandId, sendBroadcast, confirmError }) => {
   // Get the input
   const lobbyId = data.readUInt32LE(1);
   const nullCharIndex = data.indexOf(0, 5);
@@ -24,8 +24,10 @@ exports.handler = async ({ client, data, state, commandId, sendBroadcast, confir
   }
 
   // Password check, if needed
-  if (lobbyPassword && !await bcrypt.compare(inputLobbyPassword, lobbyPassword)) {
-    return confirmError(errors.wrongPassword);
+  if (lobbyPassword) {
+    const hash1 = crypto.createHash('sha1').update(inputLobbyPassword).digest('hex');
+    const hash2 = crypto.createHash('sha1').update(lobbyPassword).digest('hex');
+    if (!crypto.timingSafeEqual(hash1, hash2)) return confirmError(errors.wrongPassword);
   }
 
   // Add the player to the lobby
@@ -39,13 +41,15 @@ exports.handler = async ({ client, data, state, commandId, sendBroadcast, confir
   const size = 8 + players.reduce((size, player) => (size + player.state.username.length + 2), 0);
   const senderResponse = Buffer.alloc(size);
   senderResponse.writeUInt8(commandId);
-  senderResponse.writeUInt8(errors.noError);
-  senderResponse.writeUInt32LE(lobbyId);
-  senderResponse.writeUInt8(players.length);
-  senderResponse.writeUInt8(playerId);
+  senderResponse.writeUInt8(errors.noError, 1);
+  senderResponse.writeUInt32LE(lobbyId, 2);
+  senderResponse.writeUInt8(players.length, 6);
+  senderResponse.writeUInt8(playerId, 7);
+  let offset = 8;
   players.forEach(player => {
-    senderResponse.writeUInt8(player.state.id);
-    senderResponse.write(player.state.username + '\0');
+    senderResponse.writeUInt8(player.state.id, offset++);
+    senderResponse.write(player.state.username + '\0', offset);
+    offset += player.state.username.length + 1;
   });
 
   client.send(senderResponse);
@@ -53,8 +57,8 @@ exports.handler = async ({ client, data, state, commandId, sendBroadcast, confir
   // Broadcast the message
   const broadcastResponse = Buffer.alloc(3 + username.length);
   broadcastResponse.writeUInt8(commandIds.lobby_player_joined);
-  broadcastResponse.writeUInt8(playerId);
-  broadcastResponse.write(username + '\0');
+  broadcastResponse.writeUInt8(playerId, 1);
+  broadcastResponse.write(username + '\0', 2);
   sendBroadcast(broadcastResponse);
 };
 

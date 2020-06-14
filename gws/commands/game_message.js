@@ -4,17 +4,16 @@ const { errors } = require('../lib/errors');
  * Send or broadcast a generic message
  */
 exports.handler = ({ data, lobby, state, commandId, sendBroadcast, sendError }) => {
-  // Get the receiverId
-  const receiverId = data.readUInt8(1);
+  // Get the input
+  const receiverId = data[1];
 
   // Get the players list
   if (!lobby) return sendError(errors.lobbyNotFound);
-  const { players } = lobby;
 
   // Build the response
   const responseHeader = Buffer.alloc(2);
-  responseHeader.writeUInt8(commandId);
-  responseHeader.writeUInt8(state.id);
+  responseHeader[0] = commandId;
+  responseHeader[1] = state.id;
   const response = Buffer.concat([responseHeader, data.slice(2)]);
 
   // Broadcast or send the message
@@ -23,7 +22,7 @@ exports.handler = ({ data, lobby, state, commandId, sendBroadcast, sendError }) 
     sendBroadcast(response);
   } else {
     // Find the receiver player
-    const receiver = players.find(player => player.state.id === receiverId);
+    const receiver = lobby.players.find(player => player.state.id === receiverId);
 
     // If the receiver does not exists anymore, send an error to the sender
     if (!receiver) return sendError(errors.playerNotFound);

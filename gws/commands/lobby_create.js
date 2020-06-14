@@ -1,11 +1,13 @@
-const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const { errors } = require('../lib/errors');
 const { createLobby } = require('../models/lobby');
 
 /**
  * Create a lobby
  */
-exports.handler = async ({ data, state, client, commandId }) => {
+exports.handler = ({ data, state, lobby, client, commandId, confirmError }) => {
+  if (lobby) return confirmError(errors.alreadyInLobby);
+
   // Get the lobby name
   let nullCharIndex = data.indexOf(0);
   const lobbyName = data.slice(1, nullCharIndex).toString();
@@ -21,28 +23,29 @@ exports.handler = async ({ data, state, client, commandId }) => {
 
   // Get the password and hash it (if specified)
   let password = data.slice(offset, data.length - 1).toString();
-  if (password) password = await bcrypt.hash(password, 8);
+  if (password) password = crypto.createHash('sha1').update(password).digest('hex');
 
   // Create the lobby
-  const lobby = createLobby(lobbyName, maxPlayers, client, password);
+  const createdLobby = createLobby(lobbyName, maxPlayers, client, password);
 
   // Update the client state
   state.id = 0;
   state.username = adminName;
-  state.lobby = lobby;
+  state.lobby = createdLobby;
 
   // Send the response
   const payload = Buffer.alloc(3);
   payload.writeUInt8(commandId);
-  payload.writeUInt8(errors.noError);
-  payload.writeUInt8(lobby.id);
+  payload.writeUInt8(errors.noError, 1);
+  payload.writeUInt8(createdLobby.id, 2);
+
   client.send(payload);
 };
 
 /**
 interface Input {
   lobbyName       string
-  maxPlayer       u8
+  maxPlayers      u8
   adminName       string
   password?       string
 }

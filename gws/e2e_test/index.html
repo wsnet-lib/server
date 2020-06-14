@@ -1,0 +1,105 @@
+<h3>WEBSOCKET E2E TEST</h3>
+<p><button onclick="testCreateLobby()">Create lobby</button></p>
+<p><button onclick="testLeaveLobby()">Leave lobby</button></p>
+<p><button onclick="testListLobbies()">List lobbies</button></p>
+<p><button onclick="testSendMessage()">Send message</button></p>
+<p><button onclick="testSetAllowJoin()">Set allow join</button></p>
+<p><button onclick="testSetMaxPlayers()">Set max players</button></p>
+
+<script src="lib.js"></script>
+
+<script>
+  let timeStart = new Date()
+
+  // WebSocket
+  const ws = new WebSocket("ws://localhost:8080")
+  // const ws = new WebSocket("ws://heroku-test-poll.herokuapp.com")
+  ws.binaryType = 'arraybuffer'
+  const send = sendBuffer.bind(null, ws)
+
+  ws.onopen = () => {
+    console.log(`%cConnection established in ${time()}`, "color: lime")
+  }
+
+  ws.onclose = () => {
+    console.log("%cConnection failed or lost", "color: red")
+  }
+
+  ws.onmessage = ({ data }) => {
+    const array = decodeMessage(data)
+    console.log(`On message '${Object.keys(commands)[array[0]]}':`, array)
+
+    switch (array[0]) {
+      case commands.error:
+        error(array[1])
+        break
+
+      case commands.lobby_create:
+        if (array[1]) { error(array[1]); break }
+        console.log(`Lobby created in ${time()}. ID: ${array[2]}`)
+        break;
+
+      case commands.lobby_leave:
+        if (array[1]) { error(array[1]); break }
+        console.log(`Lobby leaved in ${time()}. ID: ${array[1]}`)
+        break;
+
+      case commands.lobby_list:
+        console.log(`Lobby list in ${time()}. ID: ${array.length > 1 ? array[1] : "No lobbies found"}`)
+        break;
+
+      case commands.game_message:
+        const str = String.fromCharCode.apply(null, new Uint8Array(array.slice(2)));
+        console.log(`Received message in ${time()} from playerId ${array[1]}: ${str}`)
+        break
+
+      case commands.lobby_allow_join:
+        if (array[1]) { error(array[1]); break }
+        console.log(`Set lobby allowJoin in ${time()}`)
+        break
+
+      case commands.lobby_max_players:
+        if (array[1]) { error(array[1]); break }
+        console.log(`Set lobby maxPlayers in ${time()}`)
+        break
+    }
+    console.log('---');
+  }
+
+  // Functions
+  function testCreateLobby() {
+    console.log("%cCreating lobby..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_create, ...string("Lobby"), 32, ...string("John"), ...string("password"))
+  }
+
+  function testSendMessage() {
+    console.log("%cSending message..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.game_message, 0, ...string("Hello world!"))
+  }
+
+  function testSetAllowJoin() {
+    console.log("%cSetting lobby flag: allowJoin..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_allow_join, 1)
+  }
+
+  function testSetMaxPlayers() {
+    console.log("%cSetting lobby flag: maxPlayers..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_max_players, 8)
+  }
+
+  function testLeaveLobby() {
+    console.log("%cLeaving lobby..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_leave)
+  }
+
+  function testListLobbies() {
+    console.log("%cGetting the lobby list..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_list)
+  }
+</script>

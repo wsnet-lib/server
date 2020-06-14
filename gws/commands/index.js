@@ -9,9 +9,13 @@ const commandHandlers = [
   require('./lobby_leave').handler,
   null, // OutputCommand: lobby_player_left
   require('./lobby_transfer').handler,
+  null, // OutputCommand: lobby_transfer_changed
   require('./lobby_allow_join').handler,
+  null, // OutputCommand: lobby_allow_join_changed
   require('./lobby_max_players').handler,
-  require('./lobby_kick').handler
+  null, // OutputCommand: lobby_max_players_changed
+  require('./lobby_kick').handler,
+  null // OutputCommand: lobby_player_kicked
 ];
 
 /** Command handlers */

@@ -1,5 +1,5 @@
 const WebSocket = require('ws');
-const { execCommand } = require('./lib/commands');
+const { execCommand } = require('./lib/execCommand');
 
 /** @type {WebSocket.Server} */
 let server;
@@ -44,9 +44,9 @@ exports.start = (options = {}) => {
       client.terminate();
     });
 
-    client.on('message', async (data) => {
+    client.on('message', (data) => {
       try {
-        await execCommand(server, client, data);
+        execCommand(server, client, data);
       } catch (err) {
         onClientError(err);
       }
