@@ -28,21 +28,21 @@ exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confi
       break;
     }
   }
-  
-  // confirm the player kick/ban 
-  const response = Buffer.alloc(4); 
-  response.writeUInt8(commandId); 
+
+  // Confirm the player kick/ban
+  const response = Buffer.alloc(4);
+  response.writeUInt8(commandId);
   response.writeUInt8(errors.noError);
   response.writeUInt8(kickedPlayerId);
   response.writeUInt8(kickOrBan);
   client.send(response);
 
   // Broadcast the kicked player to other lobby players
-  const response = Buffer.alloc(3); 
-  response.writeUInt8(commandIds.lobby_player_kicked);
-  response.writeUInt8(kickedPlayerId);
-  response.writeUInt8(kickOrBan);
-  sendBroadcast(response);
+  const broadcastResponse = Buffer.alloc(3);
+  broadcastResponse.writeUInt8(commandIds.lobby_player_kicked);
+  broadcastResponse.writeUInt8(kickedPlayerId);
+  broadcastResponse.writeUInt8(kickOrBan);
+  sendBroadcast(broadcastResponse);
 };
 
 /**
@@ -52,7 +52,14 @@ interface Input {
   kickOrBan           u8
 }
 
-interface KickOutput {
+interface ResponseOutput {
+  commandId           u8
+  error               u8
+  playerId            u8
+  kickOrBan           u8
+}
+
+interface BroadcastOutput {
   commandId           u8
   playerId            u8
   kickOrBan           u8

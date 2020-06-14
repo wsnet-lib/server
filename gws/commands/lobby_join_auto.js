@@ -13,7 +13,7 @@ exports.handler = async ({ client, data, state, commandId, sendBroadcast, confir
 
   // Get the first available lobby
   const lobby = findLobby(dateSort, maxPlayersSort);
-  if (!lobby) return confirmError(errors.lobbyJoinNotFound);
+  if (!lobby) return confirmError(errors.lobbyNotFound);
   const { players, freeIds } = lobby;
 
   // Add the player to the lobby
@@ -57,6 +57,7 @@ interface Input {
 
 interface SenderOutput {
   commandId           u8
+  error               u8
   lobbyId             u32
   playerId            u8
   playersCount        u8

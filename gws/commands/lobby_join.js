@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const { errors } = require('../lib/errors');
 const { commandIds } = require('../lib/commands');
 const { getLobby } = require('../models/lobby');
@@ -20,7 +20,7 @@ exports.handler = async ({ client, data, state, commandId, sendBroadcast, confir
 
   // Max players check
   if (players.length >= maxPlayers || !freeIds.length) {
-    return confirmError(errors.lobbyJoinNotFound);
+    return confirmError(errors.lobbyNotFound);
   }
 
   // Password check, if needed
@@ -68,6 +68,7 @@ interface Input {
 
 interface SenderOutput {
   commandId           u8
+  error               u8
   lobbyId             u32
   playerId            u8
   playersCount        u8

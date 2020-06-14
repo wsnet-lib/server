@@ -3,7 +3,7 @@ const { errors } = require('../lib/errors');
 /**
  * Send or broadcast a generic message
  */
-exports.handler = ({ client, data, lobby, state, commandId, sendBroadcast, sendError }) => {
+exports.handler = ({ data, lobby, state, commandId, sendBroadcast, sendError }) => {
   // Get the receiverId
   const receiverId = data.readUInt8(1);
 
@@ -31,7 +31,6 @@ exports.handler = ({ client, data, lobby, state, commandId, sendBroadcast, sendE
     // Send the message to the receiver
     receiver.send(response);
   }
-
 };
 
 /**

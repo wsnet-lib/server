@@ -14,19 +14,19 @@ exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confi
 
   // Set the flag
   lobby.allowJoin = allowJoin;
-  
-  // confirm the allow join change
-  const response = Buffer.alloc(3); 
-  response.writeUInt8(commandId); 
+
+  // Confirm the allow join change
+  const response = Buffer.alloc(3);
+  response.writeUInt8(commandId);
   response.writeUInt8(errors.noError);
-  response.writeUInt8(allowJoin); 
+  response.writeUInt8(allowJoin);
   client.send(response);
 
   // Broadcast the allow join to all players
-  const response = Buffer.alloc(2);
-  response.writeUInt8(commandIds.lobby_allow_join_changed);
-  response.writeUInt8(allowJoin);
-  sendBroadcast(response);
+  const broadcastResponse = Buffer.alloc(2);
+  broadcastResponse.writeUInt8(commandIds.lobby_allow_join_changed);
+  broadcastResponse.writeUInt8(allowJoin);
+  sendBroadcast(broadcastResponse);
 };
 
 /**
@@ -35,7 +35,14 @@ interface Input {
   allowJoin           u8
 }
 
-interface Output {
+interface SenderOutput {
   commandId           u8
+  error               u8
+  allowJoin           u8
+}
+
+interface BroadcastOutput {
+  commandId           u8
+  allowJoin           u8
 }
 */

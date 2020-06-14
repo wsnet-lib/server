@@ -20,7 +20,7 @@ exports.handler = ({ client, lobby, state, commandId, sendBroadcast, sendConfirm
   let deletedLobby = false;
   state.lobby = null;
 
-  // If this user was an admin, assign the admin to another player if any or delete the lobby
+  // If this user was an admin, assign the admin to another player if any, or delete the lobby
   if (lobby.adminId === state.id) {
     if (players.length) {
       lobby.adminId = players[0].id;

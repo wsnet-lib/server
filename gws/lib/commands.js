@@ -45,7 +45,7 @@ exports.execCommand = (server, client, data) => {
     client.send(errorResp);
   };
 
-   /**
+  /**
    * Send an error to the sender using the incoming commandId
    * @param {Number} errorId
    */
@@ -87,6 +87,5 @@ exports.execCommand = (server, client, data) => {
     sendBroadcast: (response) => {
       client.lobby.players.forEach(player => client !== player && player.send(response));
     }
- 
   });
 };

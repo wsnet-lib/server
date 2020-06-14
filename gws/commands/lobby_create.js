@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const { errors } = require('../lib/errors');
 const { createLobby } = require('../models/lobby');
 
@@ -49,5 +49,6 @@ interface Input {
 
 interface Output {
   commandId       u8
+  error           u8
   lobbyId         u8
 */

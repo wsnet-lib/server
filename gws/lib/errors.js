@@ -1,18 +1,17 @@
 exports.errors = {
-  commandNotFound: 0,
-  playerNotFound: 1,
-  lobbyNotFound: 2,
-  lobbyJoinNotFound: 3,
+  noError: 0,
+  commandNotFound: 1,
+  playerNotFound: 2,
+  lobbyNotFound: 3,
   unauthorized: 4,
   wrongPassword: 5,
   maxLobbyPlayers: 6,
-  inputValidationFailed: 7,
-  noError : 255
+  inputValidationFailed: 7
 };
 
 /**
 interface ErrorOutput {
   commandId     u8
-  errorId       u16
+  errorId       u8
 }
 */
