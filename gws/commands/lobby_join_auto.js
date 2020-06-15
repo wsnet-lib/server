@@ -9,11 +9,11 @@ exports.handler = async ({ client, data, state, sendBroadcast, confirmError }) =
   // Get the input
   const dateSort = data.readUInt8(1);
   const maxPlayersSort = data.readUInt8(2);
-  const username = data.slice(3);
+  const username = data.slice(3, data.length - 1);
 
   // Get the first available lobby
   if (state.lobby) return confirmError(errors.alreadyInLobby, commandIds.lobby_join);
-  const lobby = findLobby(dateSort, maxPlayersSort);
+  const lobby = findLobby(dateSort, maxPlayersSort, state.ip);
   if (!lobby) return confirmError(errors.lobbyNotFound, commandIds.lobby_join);
   const { players, freeIds } = lobby;
 

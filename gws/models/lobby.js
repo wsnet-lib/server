@@ -74,35 +74,42 @@ exports.createLobby = (lobbyName, maxPlayers, client, password) => {
   return lobby;
 };
 
-// Cached sorting functions
-const sortByDate = (a, b) => b.createdAt - a.createdAt;
-const sortByMaxPlayers = (a, b) => b.players.length - a.players.length;
-const sortByAll = (a, b) => b.createdAt - a.createdAt || b.players.length - a.players.length;
+// Cached functions
+const hasProp = Object.prototype.hasOwnProperty.bind(Object);
+const sortByAllAsc = (a, b) => a.createdAt - b.createdAt || a.players.length - b.players.length;
+const sortByAllDesc = (a, b) => b.createdAt - a.createdAt || b.players.length - a.players.length;
 
 /**
    * Find a lobby based on the sort criteria
    *
-   * @param {Boolean} dateSort (0=disabled, 1=enabled)
-   * @param {Boolean} maxPlayersSort (0=disabled, 1=enabled)
+   * @param {Boolean} dateSort (0=disabled, 1=asc, 2=desc)
+   * @param {Boolean} maxPlayersSort (0=disabled, 1=asc, 2=desc)
+   * @param {String} playerIp
    *
    * @return {Lobby}
    */
-exports.findLobby = (dateSort, maxPlayersSort) => {
-  // Get the sorting method
-  let sortMethod;
-  if (!dateSort && !maxPlayersSort) {
-    sortMethod = undefined;
-  } else if (dateSort && !maxPlayersSort) {
-    sortMethod = sortByDate;
-  } else if (!dateSort && maxPlayersSort) {
-    sortMethod = sortByMaxPlayers;
-  } else {
-    sortMethod = sortByAll;
+exports.findLobby = (dateSort, maxPlayersSort, playerIp) => {
+  let lobbiesArray = Object.values(lobbies);
+
+  // Sort the lobbies, if specified
+  if (dateSort || maxPlayersSort) {
+    lobbiesArray = lobbiesArray.sort((a, b) => {
+      const compareDate = dateSort === 1
+        ? a.createdAt - b.createdAt
+        : b.createdAt - a.createdAt;
+
+      const compareMaxPlayers = maxPlayersSort === 1
+        ? a.players.length - b.players.length
+        : b.players.length - a.players.length;
+
+      if (dateSort !== 0) {
+        return maxPlayersSort === 0 ? compareDate : (compareDate || compareMaxPlayers);
+      } else if (maxPlayersSort !== 0) {
+        return dateSort === 0 ? compareMaxPlayers : (compareDate || compareMaxPlayers);
+      }
+    });
   }
 
-  // Sort the lobbies
-  const sortedLobbies = Object.values(lobbies).sort(sortMethod);
-
-  // Get the first lobby not full and without a password
-  return sortedLobbies.find(lobby => lobby.players.length < lobby.maxPlayers && !lobby.password);
+  // Get the first lobby not fully and without a password
+  return lobbiesArray.find(lobby => lobby.players.length < lobby.maxPlayers && !lobby.password && !hasProp(lobby.bans, playerIp));
 };

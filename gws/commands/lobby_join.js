@@ -3,6 +3,8 @@ const { errors } = require('../lib/errors');
 const { commandIds } = require('../lib/commandIds');
 const { getLobby } = require('../models/lobby');
 
+const hasProp = Object.prototype.hasOwnProperty.bind(Object);
+
 /**
  * Join a lobby
  */
@@ -17,7 +19,10 @@ exports.handler = ({ client, data, state, commandId, sendBroadcast, confirmError
   if (state.lobby) return confirmError(errors.alreadyInLobby);
   const lobby = getLobby(lobbyId);
   if (!lobby) return confirmError(errors.lobbyNotFound);
-  const { password: lobbyPassword, players, maxPlayers, freeIds } = lobby;
+  const { password: lobbyPassword, players, maxPlayers, freeIds, bans } = lobby;
+
+  // Bans check
+  if (hasProp(bans, state.ip)) return confirmError(errors.unauthorized);
 
   // Max players check
   if (players.length >= maxPlayers || !freeIds.length) {

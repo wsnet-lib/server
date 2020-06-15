@@ -16,20 +16,13 @@ exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confi
   // Find the player
   const { players } = lobby;
   let foundPlayer;
+  let foundPlayerIdx;
 
   for (let i = 0; i < players.length; i++) {
     const player = players[i];
-    const playerState = player.state;
-    if (playerState.id !== kickedPlayerId) continue;
+    if (player.state.id !== kickedPlayerId) continue;
     foundPlayer = player;
-
-    // Add a ban for this player if specified
-    if (kickOrBan) lobby.bans[playerState.ip] = true;
-
-    // Kick the player
-    players[i].state = {};
-    lobby.players.splice(i, 1);
-    lobby.freeIds.push(kickedPlayerId);
+    foundPlayerIdx = i;
     break;
   }
 
@@ -48,8 +41,17 @@ exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confi
   broadcastResponse[0] = commandIds.lobby_player_kicked;
   broadcastResponse[1] = kickedPlayerId;
   broadcastResponse[2] = kickOrBan;
-  foundPlayer.send(broadcastResponse);
   sendBroadcast(broadcastResponse);
+
+  // Add a ban for this player if specified
+  if (kickOrBan) lobby.bans[state.ip] = true;
+
+  // Kick the player
+  delete foundPlayer.state.id;
+  delete foundPlayer.state.lobby;
+  delete foundPlayer.state.username;
+  lobby.players.splice(foundPlayerIdx, 1);
+  lobby.freeIds.push(kickedPlayerId);
 };
 
 /**

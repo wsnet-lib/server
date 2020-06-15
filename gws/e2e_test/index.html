@@ -51,7 +51,7 @@
   function connect() {
     timeStart = new Date()
     ws = new WebSocket("ws://localhost:8080")
-    // const ws = new WebSocket("ws://heroku-test-poll.herokuapp.com")
+    // ws = new WebSocket("ws://heroku-test-poll.herokuapp.com")
     ws.binaryType = 'arraybuffer'
     send = sendBuffer.bind(null, ws)
 
@@ -126,11 +126,11 @@
           break
 
         case commands.lobby_allow_join_changed:
-          console.log(`Admin has set lob allowJoin flag`)
+          console.log(`Admin has set lobby allowJoin flag`)
           break
 
         case commands.lobby_max_players_changed:
-          console.log(`Admin has set lob maxPlayers flag`)
+          console.log(`Admin has set lobby maxPlayers flag`)
           break
 
         case commands.lobby_player_kicked:
