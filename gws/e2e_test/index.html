@@ -66,7 +66,7 @@
 
     ws.onmessage = ({ data }) => {
       const array = decodeMessage(data)
-      console.log(`On message '${Object.keys(commands)[array[0]]}':`, array)
+      console.log(`On event '${Object.keys(commands)[array[0]]}':`, array)
 
       switch (array[0]) {
         case commands.error:
@@ -89,7 +89,7 @@
 
         case commands.game_message:
           const str = String.fromCharCode.apply(null, new Uint8Array(array.slice(2)));
-          console.log(`Received message from playerId ${array[1]}: ${str}`)
+          console.log(`Received message: ${str}`)
           break
 
         case commands.lobby_allow_join:
