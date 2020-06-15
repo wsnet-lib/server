@@ -65,6 +65,7 @@ function sendBuffer(ws, ...array) {
     view[idx] = elem;
   });
   ws.send(view);
+  console.log('---');
 }
 
 function time() {
@@ -74,10 +75,3 @@ function time() {
 function error(errorId) {
   console.log(`%cError received in ${time()}: ${errors[errorId]}`, 'color: red');
 }
-
-console.log(`  ________   __      __    _________
-/  _____/  /  \\    /  \\  /   _____/
-/   \\  ___  \\   \\/\\/   /  \\_____  \\ 
-\\    \\_\\  \\  \\        /   /        \\
-\\______  /   \\__/\\  /   /_______  /
-       \\/         \\/            \\/ `);

@@ -31,9 +31,6 @@ exports.handler = ({ client, lobby, state, sendBroadcast, sendConfirm, confirmEr
     }
   }
 
-  delete state.lobby;
-  lobby = null;
-
   // Broadcast the removed player to all the other lobby players
   if (!deletedLobby) {
     const response = Buffer.alloc(3);
@@ -42,6 +39,9 @@ exports.handler = ({ client, lobby, state, sendBroadcast, sendConfirm, confirmEr
     response.writeUInt8(lobby.adminId, 2);
     sendBroadcast(response);
   }
+
+  delete state.lobby;
+  lobby = null;
 
   // Send the confirmation to the sender
   sendConfirm();

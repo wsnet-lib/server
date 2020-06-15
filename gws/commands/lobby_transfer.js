@@ -10,7 +10,7 @@ exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confi
 
   // Lobby check
   if (!lobby) return confirmError(errors.lobbyNotFound);
-  if (lobby.adminId !== state.id) return confirmError(errors.unauthorized);
+  if (lobby.adminId !== state.id || newAdminId === state.id) return confirmError(errors.unauthorized);
 
   // Set the lobby admin
   lobby.adminId = newAdminId;

@@ -22,8 +22,8 @@ exports.handler = ({ data, state, lobby, client, commandId, confirmError }) => {
   offset = nullCharIndex + 1;
 
   // Get the password and hash it (if specified)
-  let password = data.slice(offset, data.length - 1).toString();
-  if (password) password = crypto.createHash('sha1').update(password).digest('hex');
+  let password = data.slice(offset, data.length - 1).toString() || null;
+  if (password) password = crypto.createHash('sha1').update(password).digest();
 
   // Create the lobby
   const createdLobby = createLobby(lobbyName, maxPlayers, client, password);

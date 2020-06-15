@@ -38,8 +38,6 @@ exports.handler = ({ client, commandId }) => {
 
     // Has password
     payload[offset] = lobby.password ? 1 : 0;
-
-    // console.log(payload.forEach(byte => console.log(byte)));
   }
 
   // Send the response

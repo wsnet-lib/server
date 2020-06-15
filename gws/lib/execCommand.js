@@ -27,9 +27,9 @@ exports.execCommand = (server, client, data) => {
    * Send an error to the sender using the incoming commandId
    * @param {Number} errorId
    */
-  const confirmError = (errorId) => {
+  const confirmError = (errorId, customCommandId = undefined) => {
     const errorResp = Buffer.alloc(2);
-    errorResp[0] = commandId;
+    errorResp[0] = customCommandId === undefined ? commandId : customCommandId;
     errorResp[1] = errorId;
     client.send(errorResp);
   };

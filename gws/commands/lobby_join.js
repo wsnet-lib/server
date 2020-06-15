@@ -11,9 +11,10 @@ exports.handler = ({ client, data, state, commandId, sendBroadcast, confirmError
   const nullCharIndex = data.indexOf(0, 1);
   const username = data.slice(1, nullCharIndex).toString();
   const lobbyId = data.readUInt32LE(nullCharIndex + 1);
-  const inputLobbyPassword = data.slice(nullCharIndex + 5).toString();
+  const inputLobbyPassword = data.slice(nullCharIndex + 5, data.length - 1).toString();
 
   // Lobby check
+  if (state.lobby) return confirmError(errors.alreadyInLobby);
   const lobby = getLobby(lobbyId);
   if (!lobby) return confirmError(errors.lobbyNotFound);
   const { password: lobbyPassword, players, maxPlayers, freeIds } = lobby;
@@ -25,9 +26,10 @@ exports.handler = ({ client, data, state, commandId, sendBroadcast, confirmError
 
   // Password check, if needed
   if (lobbyPassword) {
-    const hash1 = crypto.createHash('sha1').update(inputLobbyPassword).digest('hex');
-    const hash2 = crypto.createHash('sha1').update(lobbyPassword).digest('hex');
-    if (!crypto.timingSafeEqual(hash1, hash2)) return confirmError(errors.wrongPassword);
+    const hashedInputPsw = crypto.createHash('sha1').update(inputLobbyPassword).digest();
+    if (!crypto.timingSafeEqual(hashedInputPsw, lobbyPassword)) {
+      return confirmError(errors.wrongPassword);
+    }
   }
 
   // Add the player to the lobby
