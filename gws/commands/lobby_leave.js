@@ -33,7 +33,6 @@ exports.handler = ({ client, lobby, state, sendBroadcast, sendConfirm, confirmEr
 
   delete state.lobby;
   lobby = null;
-  // console.log(lobby);
 
   // Broadcast the removed player to all the other lobby players
   if (!deletedLobby) {

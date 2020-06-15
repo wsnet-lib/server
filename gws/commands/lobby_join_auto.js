@@ -26,7 +26,7 @@ exports.handler = async ({ client, data, state, commandId, sendBroadcast, confir
   // Build the sender response
   const size = 8 + players.reduce((size, player) => (size + player.state.username.length + 2), 0);
   const senderResponse = Buffer.alloc(size);
-  senderResponse.writeUInt8(commandId);
+  senderResponse.writeUInt8(commandIds.lobby_join);
   senderResponse.writeUInt8(errors.noError, 1);
   senderResponse.writeUInt32LE(lobby.id, 2);
   senderResponse.writeUInt8(players.length, 6);

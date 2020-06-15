@@ -8,10 +8,10 @@ const { getLobby } = require('../models/lobby');
  */
 exports.handler = ({ client, data, state, commandId, sendBroadcast, confirmError }) => {
   // Get the input
-  const lobbyId = data.readUInt32LE(1);
-  const nullCharIndex = data.indexOf(0, 5);
-  const inputLobbyPassword = data.slice(5, nullCharIndex).toString();
-  const username = data.slice(nullCharIndex + 1).toString();
+  const nullCharIndex = data.indexOf(0, 1);
+  const username = data.slice(1, nullCharIndex).toString();
+  const lobbyId = data.readUInt32LE(nullCharIndex + 1);
+  const inputLobbyPassword = data.slice(nullCharIndex + 5).toString();
 
   // Lobby check
   const lobby = getLobby(lobbyId);
@@ -65,9 +65,9 @@ exports.handler = ({ client, data, state, commandId, sendBroadcast, confirmError
 /**
 interface Input {
   commandId           u8
+  username            string
   lobbyId             u32
   lobbyPassword?      string
-  username            string
 }
 
 interface SenderOutput {

@@ -5,6 +5,7 @@
 <p><button onclick="testSendMessage()">Send message</button></p>
 <p><button onclick="testSetAllowJoin()">Set allow join</button></p>
 <p><button onclick="testSetMaxPlayers()">Set max players</button></p>
+<p><button onclick="testJoinLobby()">Join lobby</button></p>
 
 <script src="lib.js"></script>
 
@@ -45,7 +46,7 @@
         break;
 
       case commands.lobby_list:
-        console.log(`Lobby list in ${time()}. ID: ${array.length > 1 ? array[1] : "No lobbies found"}`)
+        console.log(`Lobby list in ${time()} ${array.length === 1 ? ". No lobbies found" : ""}`)
         break;
 
       case commands.game_message:
@@ -61,6 +62,11 @@
       case commands.lobby_max_players:
         if (array[1]) { error(array[1]); break }
         console.log(`Set lobby maxPlayers in ${time()}`)
+        break
+
+      case commands.lobby_join:
+        if (array[1]) { error(array[1]); break }
+        console.log(`Lobby 0 joined in ${time()}`)
         break
     }
     console.log('---');
@@ -101,5 +107,11 @@
     console.log("%cGetting the lobby list..", "color: dodgerblue")
     timeStart = Date.now()
     send(commands.lobby_list)
+  }
+
+  function testJoinLobby() {
+    console.log("%cJoining the lobby..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_join, ...string("Xeryan"), ...u32(0), ...string("test"))
   }
 </script>

@@ -42,6 +42,12 @@ function string(str) {
   return array;
 }
 
+function u32(num) {
+  const buff = new ArrayBuffer(4);
+  new DataView(buff).setUint32(0, num);
+  return Array.from(new Uint8Array(buff));
+}
+
 function decodeMessage(data) {
   const dv = new DataView(data);
   const array = new Array(data.byteLength);
