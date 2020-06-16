@@ -100,7 +100,7 @@
             // Get the lobby name
             const nullChar = array.indexOf(0, offset)
             const lobbyName = arrayToString(array.slice(offset, nullChar))
-            offset += lobbyName.length + 2
+            offset += lobbyName.length + 1
 
             // Get the players count
             const playersCount = array[offset++]
@@ -120,7 +120,7 @@
             })
           }
 
-          console.dir(lobbies)
+          console.dir(JSON.stringify(lobbies, null, 2))
           break;
 
         case commands.game_message:
@@ -181,7 +181,7 @@
   function testCreateLobby() {
     console.log("%cCreating lobby..", "color: dodgerblue")
     timeStart = Date.now()
-    send(commands.lobby_create, ...string("Lobby"), 32, ...string("John"))
+    send(commands.lobby_create, ...string("lobby1"), 32, ...string("gino"))
   }
 
   function testCreateLobbyWithPsw() {
