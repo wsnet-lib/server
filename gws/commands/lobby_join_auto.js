@@ -30,8 +30,8 @@ exports.handler = async ({ client, data, state, sendBroadcast, confirmError }) =
   senderResponse.writeUInt8(commandIds.lobby_join);
   senderResponse.writeUInt8(errors.noError, 1);
   senderResponse.writeUInt32LE(lobby.id, 2);
-  senderResponse.writeUInt8(players.length, 6);
-  senderResponse.writeUInt8(playerId, 7);
+  senderResponse.writeUInt8(playerId, 6);
+  senderResponse.writeUInt8(players.length, 7);
   let offset = 8;
   players.forEach(player => {
     senderResponse.writeUInt8(player.state.id, offset++);
