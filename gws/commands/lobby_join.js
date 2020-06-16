@@ -21,9 +21,9 @@ exports.handler = ({ client, data, state, commandId, sendBroadcast, confirmError
   if (!lobby) return confirmError(errors.lobbyNotFound);
   const { password: lobbyPassword, players, maxPlayers, freeIds, bans } = lobby;
 
-  console.log(bans);
+  //hasProp(bans, state.ip) -> bans[state.ip]
   // Bans/join check
-  if (hasProp(bans, state.ip) || !lobby.allowJoin) return confirmError(errors.unauthorized);
+  if (bans[state.ip] || !lobby.allowJoin) return confirmError(errors.unauthorized);
 
   // Max players check
   if (players.length >= maxPlayers) {
