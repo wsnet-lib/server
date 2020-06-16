@@ -10,20 +10,7 @@ exports.handler = ({ client, lobby, state, sendBroadcast, sendConfirm, confirmEr
   if (!lobby) return confirmError(errors.lobbyNotFound);
 
   // Remove the player from the lobby
-  const status = removePlayer(client);
-  if (status === -1) return confirmError(errors.playerNotFound);
-
-  // Broadcast the removed player to all the other lobby players
-  if (!status) {
-    const response = Buffer.alloc(3);
-    response[0] = commandIds.lobby_player_left;
-    response[1] = state.id;
-    response[2] = lobby.adminId;
-    sendBroadcast(response);
-  }
-
-  // Reset the player state
-  resetPlayerState(state);
+  if (!removePlayer(client)) return confirmError(errors.playerNotFound);
 
   // Send the confirmation to the sender
   sendConfirm();

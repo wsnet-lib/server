@@ -1,3 +1,5 @@
+const { commandIds } = require('../lib/commandIds');
+
 /**
  * interface Lobby {
  *  id: Number
@@ -11,8 +13,6 @@
  *  bans: Object<Bans>
  * }
  */
-
-const { errors } = require('../lib/errors');
 
 /** Lobby list */
 const lobbies = {};
@@ -111,25 +111,29 @@ exports.findLobby = (dateSort, maxPlayersSort, playerIp) => {
   }
 
   // Get the first lobby not fully and without a password
-  return lobbiesArray.find(lobby => lobby.players.length < lobby.maxPlayers && !lobby.password && !hasProp(lobby.bans, playerIp));
+  return lobbiesArray.find(
+    lobby => lobby.players.length < lobby.maxPlayers && !lobby.password && !hasProp(lobby.bans, playerIp)
+  );
 };
 
 /**
  * Handle the player disconnection
+ *
  * @param {Player} player
- * @return {Number} removal status
+ *
+ * @return {Boolean} removal status
  */
 exports.removePlayer = ({ state }) => {
   const { lobby, id: playerId } = state;
   const { players } = lobby;
   const playerLobbyIdx = players.findIndex(player => player.state.id === playerId);
-  if (playerLobbyIdx === -1) return -1;
+  if (playerLobbyIdx === -1) return false;
 
   // Remove the player from the lobby
   players.splice(playerLobbyIdx, 1);
   lobby.freeIds.push(playerId);
 
-  let deletedLobby = 0;
+  let deletedLobby = false;
 
   // If this user was an admin, assign the admin to another player if any, or delete the lobby
   if (players.length) {
@@ -138,10 +142,25 @@ exports.removePlayer = ({ state }) => {
     }
   } else {
     exports.deleteLobby(lobby.id);
-    deletedLobby = 1;
+    deletedLobby = true;
   }
 
-  return deletedLobby;
+  // Broadcast the removed player to all the other lobby players
+  if (!deletedLobby) {
+    const response = Buffer.alloc(3);
+    response[0] = commandIds.lobby_player_left;
+    response[1] = state.id;
+    response[2] = lobby.adminId;
+
+    for (let i = 0, len = players.length; i < len; i++) {
+      const player = players[i];
+      player.send(response);
+    }
+  }
+
+  // Reset the player state
+  exports.resetPlayerState(state);
+  return true;
 };
 
 /**
