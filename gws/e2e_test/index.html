@@ -50,8 +50,8 @@
   // WebSocket
   function connect() {
     timeStart = new Date()
-    // ws = new WebSocket("ws://localhost:8080")
-    ws = new WebSocket("wss://heroku-test-poll.herokuapp.com")
+    ws = new WebSocket("ws://localhost:8080")
+    // ws = new WebSocket("wss://heroku-test-poll.herokuapp.com")
     ws.binaryType = 'arraybuffer'
     send = sendBuffer.bind(null, ws)
 
@@ -85,6 +85,17 @@
 
         case commands.lobby_list:
           console.log(`Lobby list in ${time()} ${array.length === 1 ? ". No lobbies found" : ""}`)
+
+          // const lobbies = []
+          while (offset < array.length - 1) {
+
+          }
+          // if (array.length > 1) {
+
+          //   let str = from_u32(offset)
+          //   lobbies.push(lobby)
+          // }
+          // console.log(`Lobbies: ${lobbies}`)
           break;
 
         case commands.game_message:
@@ -151,7 +162,8 @@
   function testCreateLobbyWithPsw() {
     console.log("%cCreating lobby with password..", "color: dodgerblue")
     timeStart = Date.now()
-    send(commands.lobby_create, ...string("Lobby"), 32, ...string("John"), ...string("password"))
+    // send(commands.lobby_create, ...string("Lobby"), 32, ...string("John"), ...string("password"))
+    send(commands.lobby_create, ...string("lobby1"), 3, ...string("gino"), ...string(""), 0)
   }
 
   function testSendMessage() {

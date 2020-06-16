@@ -49,6 +49,10 @@ function u32(num) {
   return Array.from(new Uint8Array(buff));
 }
 
+function u32ToNum(array) {
+  return ((array[3]) | (array[2] << 8) | (array[1] << 16) | (array[0] << 24));
+}
+
 function decodeMessage(data) {
   const dv = new DataView(data);
   const array = new Array(data.byteLength);

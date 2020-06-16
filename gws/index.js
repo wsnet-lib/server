@@ -65,8 +65,12 @@ exports.start = (options = {}) => {
     });
 
     // Handle the client disconnection
+    client.onclose = () => {
+      console.log('Client connection closed 1');
+    };
+
     client.on('close', () => {
-      console.log('Client connection closed');
+      console.log('Client connection closed 2');
     });
 
     onClientConnection && onClientConnection(client, req);
