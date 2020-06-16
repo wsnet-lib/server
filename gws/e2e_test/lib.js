@@ -43,6 +43,14 @@ function string(str) {
   return array;
 }
 
+function arrayToString(array) {
+  let str = '';
+  for (let i = 0, len = array.length; i < len; i++) {
+    str += String.fromCharCode(array[i]);
+  }
+  return str;
+}
+
 function u32(num) {
   const buff = new ArrayBuffer(4);
   new DataView(buff).setUint32(0, num);

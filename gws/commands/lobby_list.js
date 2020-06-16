@@ -28,7 +28,7 @@ exports.handler = ({ client, commandId }) => {
 
     // Lobby name
     payload.write(lobby.name, offset);
-    offset += lobby.name.length + 1;
+    offset += lobby.name.length;
     payload[offset++] = 0;
 
     // Players count
@@ -40,9 +40,6 @@ exports.handler = ({ client, commandId }) => {
     // Has password
     payload[offset++] = lobby.password ? 1 : 0;
   }
-
-  // console.log(payload.length);
-  // console.log(payload.forEach(byte => console.log(byte)));
 
   // Send the response
   client.send(payload);

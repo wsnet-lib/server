@@ -86,16 +86,41 @@
         case commands.lobby_list:
           console.log(`Lobby list in ${time()} ${array.length === 1 ? ". No lobbies found" : ""}`)
 
-          // const lobbies = []
+          // Parse the lobbies
+          let lobbyCount = 0
+          const lobbies = []
+          let offset = 1
           while (offset < array.length - 1) {
+            lobbyCount++
 
+            // Get the lobby ID
+            const lobbyId = u32ToNum(array.slice(offset, offset + 4))
+            offset += 4
+
+            // Get the lobby name
+            const nullChar = array.indexOf(0, offset)
+            const lobbyName = arrayToString(array.slice(offset, nullChar))
+            offset += lobbyName.length + 2
+
+            // Get the players count
+            const playersCount = array[offset++]
+
+            // Get the max players
+            const maxPlayers = array[offset++]
+
+            // Has password
+            const hasPassword = array[offset++]
+
+            lobbies.push({
+              id: lobbyId,
+              name: lobbyName,
+              players: playersCount,
+              maxPlayers,
+              hasPassword
+            })
           }
-          // if (array.length > 1) {
 
-          //   let str = from_u32(offset)
-          //   lobbies.push(lobby)
-          // }
-          // console.log(`Lobbies: ${lobbies}`)
+          console.dir(lobbies)
           break;
 
         case commands.game_message:
