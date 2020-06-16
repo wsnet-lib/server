@@ -12,6 +12,8 @@
  * }
  */
 
+const { errors } = require('../lib/errors');
+
 /** Lobby list */
 const lobbies = {};
 
@@ -74,10 +76,8 @@ exports.createLobby = (lobbyName, maxPlayers, client, password) => {
   return lobby;
 };
 
-// Cached functions
+// Cached function
 const hasProp = Object.prototype.hasOwnProperty.bind(Object);
-const sortByAllAsc = (a, b) => a.createdAt - b.createdAt || a.players.length - b.players.length;
-const sortByAllDesc = (a, b) => b.createdAt - a.createdAt || b.players.length - a.players.length;
 
 /**
    * Find a lobby based on the sort criteria
@@ -112,4 +112,44 @@ exports.findLobby = (dateSort, maxPlayersSort, playerIp) => {
 
   // Get the first lobby not fully and without a password
   return lobbiesArray.find(lobby => lobby.players.length < lobby.maxPlayers && !lobby.password && !hasProp(lobby.bans, playerIp));
+};
+
+/**
+ * Handle the player disconnection
+ * @param {Player} player
+ * @return {Number} removal status
+ */
+exports.removePlayer = ({ state }) => {
+  const { lobby, id: playerId } = state;
+  const { players } = lobby;
+  const playerLobbyIdx = players.findIndex(player => player.state.id === playerId);
+  if (playerLobbyIdx === -1) return -1;
+
+  // Remove the player from the lobby
+  players.splice(playerLobbyIdx, 1);
+  lobby.freeIds.push(playerId);
+
+  let deletedLobby = 0;
+
+  // If this user was an admin, assign the admin to another player if any, or delete the lobby
+  if (players.length) {
+    if (lobby.adminId === playerId) {
+      lobby.adminId = players[0].id;
+    }
+  } else {
+    exports.deleteLobby(lobby.id);
+    deletedLobby = 1;
+  }
+
+  return deletedLobby;
+};
+
+/**
+ * Reset the player state
+ * @param {State} state
+ */
+exports.resetPlayerState = (state) => {
+  delete state.id;
+  delete state.lobby;
+  delete state.username;
 };

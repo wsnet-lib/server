@@ -1,49 +1,29 @@
 const { errors } = require('../lib/errors');
 const { commandIds } = require('../lib/commandIds');
-const { deleteLobby } = require('../models/lobby');
+const { removePlayer, resetPlayerState } = require('../models/lobby');
 
 /**
  * Kick or ban a player
  */
-exports.handler = ({ lobby, state, sendBroadcast, sendConfirm, confirmError }) => {
+exports.handler = ({ client, lobby, state, sendBroadcast, sendConfirm, confirmError }) => {
   // Lobby check
   if (!lobby) return confirmError(errors.lobbyNotFound);
 
   // Remove the player from the lobby
-  const { players } = lobby;
-  const { id: playerId } = state;
-  const playerLobbyIdx = players.findIndex(player => player.state.id === playerId);
-  if (!playerLobbyIdx) return confirmError(errors.playerNotFound);
-
-  // Remove the player from the lobby
-  players.splice(playerLobbyIdx, 1);
-  lobby.freeIds.push(playerId);
-
-  let deletedLobby = false;
-
-  // If this user was an admin, assign the admin to another player if any, or delete the lobby
-  if (lobby.adminId === playerId) {
-    if (players.length) {
-      lobby.adminId = players[0].id;
-    } else {
-      deleteLobby(lobby.id);
-      deletedLobby = true;
-    }
-  }
+  const status = removePlayer(client);
+  if (status === -1) return confirmError(errors.playerNotFound);
 
   // Broadcast the removed player to all the other lobby players
-  if (!deletedLobby) {
+  if (!status) {
     const response = Buffer.alloc(3);
     response[0] = commandIds.lobby_player_left;
-    response[1] = playerId;
+    response[1] = state.id;
     response[2] = lobby.adminId;
     sendBroadcast(response);
   }
 
-  delete state.id;
-  delete state.lobby;
-  delete state.username;
-  lobby = null;
+  // Reset the player state
+  resetPlayerState(state);
 
   // Send the confirmation to the sender
   sendConfirm();

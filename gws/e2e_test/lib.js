@@ -58,7 +58,7 @@ function u32(num) {
 }
 
 function u32ToNum(array) {
-  return ((array[3]) | (array[2] << 8) | (array[1] << 16) | (array[0] << 24));
+  return new DataView(new Uint32Array(array).buffer).getUint32(0, true);
 }
 
 function decodeMessage(data) {

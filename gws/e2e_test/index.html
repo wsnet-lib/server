@@ -84,8 +84,6 @@
           break;
 
         case commands.lobby_list:
-          console.log(`Lobby list in ${time()} ${array.length === 1 ? ". No lobbies found" : ""}`)
-
           // Parse the lobbies
           let lobbyCount = 0
           const lobbies = []
@@ -120,6 +118,7 @@
             })
           }
 
+          console.log(`Lobby list in ${time()}. Lobbies found: ${lobbyCount}`)
           console.dir(JSON.stringify(lobbies, null, 2))
           break;
 

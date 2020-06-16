@@ -2,6 +2,7 @@ const WebSocket = require('ws');
 const { execCommand } = require('./lib/execCommand');
 const { errors } = require('./lib/errors');
 const { commandIds } = require('./lib/commandIds');
+const { removePlayer } = require('./models/lobby');
 
 /** @type {WebSocket.Server} */
 let server;
@@ -65,13 +66,7 @@ exports.start = (options = {}) => {
     });
 
     // Handle the client disconnection
-    client.onclose = () => {
-      console.log('Client connection closed 1');
-    };
-
-    client.on('close', () => {
-      console.log('Client connection closed 2');
-    });
+    client.on('close', () => client.state.lobby && removePlayer(client));
 
     onClientConnection && onClientConnection(client, req);
   });
