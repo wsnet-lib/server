@@ -25,16 +25,17 @@ exports.handler = async ({ client, data, state, sendBroadcast, confirmError }) =
   players.push(client);
 
   // Build the sender response
-  const size = 8 + players.reduce((size, player) => (size + player.state.username.length + 2), 0);
+  const size = 9 + players.reduce((size, player) => (size + player.state.username.length + 2), 0);
   const senderResponse = Buffer.alloc(size);
-  senderResponse.writeUInt8(commandIds.lobby_join);
-  senderResponse.writeUInt8(errors.noError, 1);
+  senderResponse[0] = commandIds.lobby_join;
+  senderResponse[1] = errors.noError;
   senderResponse.writeUInt32LE(lobby.id, 2);
-  senderResponse.writeUInt8(playerId, 6);
-  senderResponse.writeUInt8(players.length, 7);
-  let offset = 8;
+  senderResponse[6] = lobby.adminId;
+  senderResponse[7] = playerId;
+  senderResponse[8] = players.length;
+  let offset = 9;
   players.forEach(player => {
-    senderResponse.writeUInt8(player.state.id, offset++);
+    senderResponse[offset++] = player.state.id;
     senderResponse.write(player.state.username + '\0', offset);
     offset += player.state.username.length + 1;
   });
@@ -43,8 +44,8 @@ exports.handler = async ({ client, data, state, sendBroadcast, confirmError }) =
 
   // Broadcast the message
   const broadcastResponse = Buffer.alloc(3 + username.length);
-  broadcastResponse.writeUInt8(commandIds.lobby_player_joined);
-  broadcastResponse.writeUInt8(playerId, 1);
+  broadcastResponse[0] = commandIds.lobby_player_joined;
+  broadcastResponse[1] = playerId;
   broadcastResponse.write(username + '\0', 2);
   sendBroadcast(broadcastResponse);
 };
@@ -61,6 +62,7 @@ interface SenderOutput {
   commandId           u8
   error               u8
   lobbyId             u32
+  adminId             u8
   playerId            u8
   playersCount        u8
   [

@@ -45,14 +45,15 @@ exports.handler = ({ client, data, state, commandId, sendBroadcast, confirmError
   players.push(client);
 
   // Build the sender response
-  const size = 8 + players.reduce((size, player) => (size + player.state.username.length + 2), 0);
+  const size = 9 + players.reduce((size, player) => (size + player.state.username.length + 2), 0);
   const senderResponse = Buffer.alloc(size);
   senderResponse[0] = commandId;
   senderResponse[1] = errors.noError;
   senderResponse.writeUInt32LE(lobbyId, 2);
   senderResponse[6] = playerId;
-  senderResponse[7] = players.length;
-  let offset = 8;
+  senderResponse[7] = lobby.adminId;
+  senderResponse[8] = players.length;
+  let offset = 9;
   players.forEach(player => {
     senderResponse[offset++] = player.state.id;
     senderResponse.write(player.state.username + '\0', offset);
@@ -81,6 +82,7 @@ interface SenderOutput {
   commandId           u8
   error               u8
   lobbyId             u32
+  adminId             u8
   playerId            u8
   playersCount        u8
   [
