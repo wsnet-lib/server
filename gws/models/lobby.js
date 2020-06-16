@@ -136,7 +136,7 @@ exports.removePlayer = (state) => {
   // If this user was an admin, assign the admin to another player if any, or delete the lobby
   if (players.length) {
     if (lobby.adminId === playerId) {
-      lobby.adminId = players[0].id;
+      lobby.adminId = players[0].state.id;
     }
   } else {
     exports.deleteLobby(lobby.id);
