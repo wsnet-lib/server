@@ -1,5 +1,7 @@
 const WebSocket = require('ws');
 const { execCommand } = require('./lib/execCommand');
+const { errors } = require('./lib/errors');
+const { commandIds } = require('./lib/commandIds');
 
 /** @type {WebSocket.Server} */
 let server;
@@ -49,7 +51,22 @@ exports.start = (options = {}) => {
         execCommand(server, client, data);
       } catch (err) {
         onClientError(err);
+
+        // Try to send a generic error to the client
+        try {
+          const errorBuffer = Buffer.alloc(2);
+          errorBuffer[0] = commandIds.error;
+          errorBuffer[1] = errors.serverError;
+          client.send(errorBuffer);
+        } catch (sendError) {
+          onClientError(sendError);
+        }
       }
+    });
+
+    // Handle the client disconnection
+    client.on('close', () => {
+      console.log('Client connection closed');
     });
 
     onClientConnection && onClientConnection(client, req);

@@ -30,7 +30,8 @@ const errors = [
   'wrongPassword',
   'maxLobbyPlayers',
   'inputValidationFailed',
-  'alreadyInLobby'
+  'alreadyInLobby',
+  'serverError'
 ];
 
 function string(str) {

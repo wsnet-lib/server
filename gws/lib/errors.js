@@ -7,7 +7,8 @@ exports.errors = {
   wrongPassword: 5,
   maxLobbyPlayers: 6,
   inputValidationFailed: 7,
-  alreadyInLobby: 8
+  alreadyInLobby: 8,
+  serverError: 9
 };
 
 /**

@@ -50,8 +50,8 @@
   // WebSocket
   function connect() {
     timeStart = new Date()
-    ws = new WebSocket("ws://localhost:8080")
-    // ws = new WebSocket("ws://heroku-test-poll.herokuapp.com")
+    // ws = new WebSocket("ws://localhost:8080")
+    ws = new WebSocket("wss://heroku-test-poll.herokuapp.com")
     ws.binaryType = 'arraybuffer'
     send = sendBuffer.bind(null, ws)
 

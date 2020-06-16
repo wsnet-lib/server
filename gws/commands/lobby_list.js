@@ -10,10 +10,10 @@ exports.handler = ({ client, commandId }) => {
   const lobbies = Object.values(getLobbies());
 
   // Calculate the payload size
-  const size = lobbies.reduce((size, lobby) => (size + lobby.name.length + 9), 0);
+  const size = 1 + lobbies.reduce((size, lobby) => (size + lobby.name.length + 8), 0);
 
   // Write the response buffer
-  const payload = Buffer.alloc(1 + size);
+  const payload = Buffer.alloc(size);
   let offset = 0;
 
   // Command ID
