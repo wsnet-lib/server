@@ -25,8 +25,8 @@ exports.handler = ({ client, data, state, commandId, sendBroadcast, confirmError
   if (hasProp(bans, state.ip) || !lobby.allowJoin) return confirmError(errors.unauthorized);
 
   // Max players check
-  if (players.length >= maxPlayers || !freeIds.length) {
-    return confirmError(errors.lobbyNotFound);
+  if (players.length >= maxPlayers) {
+    return confirmError(errors.maxLobbyPlayers);
   }
 
   // Password check, if needed
