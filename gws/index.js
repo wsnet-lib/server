@@ -66,7 +66,7 @@ exports.start = (options = {}) => {
     });
 
     // Handle the client disconnection
-    client.on('close', () => client.state.lobby && removePlayer(client));
+    client.on('close', () => client.state.lobby && removePlayer(client.state));
 
     onClientConnection && onClientConnection(client, req);
   });

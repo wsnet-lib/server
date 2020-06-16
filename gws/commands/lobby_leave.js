@@ -1,16 +1,15 @@
 const { errors } = require('../lib/errors');
-const { commandIds } = require('../lib/commandIds');
-const { removePlayer, resetPlayerState } = require('../models/lobby');
+const { removePlayer } = require('../models/lobby');
 
 /**
  * Kick or ban a player
  */
-exports.handler = ({ client, lobby, state, sendBroadcast, sendConfirm, confirmError }) => {
+exports.handler = ({ lobby, state, sendConfirm, confirmError }) => {
   // Lobby check
   if (!lobby) return confirmError(errors.lobbyNotFound);
 
   // Remove the player from the lobby
-  if (!removePlayer(client)) return confirmError(errors.playerNotFound);
+  if (!removePlayer(state)) return confirmError(errors.playerNotFound);
 
   // Send the confirmation to the sender
   sendConfirm();

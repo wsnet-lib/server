@@ -118,12 +118,10 @@ exports.findLobby = (dateSort, maxPlayersSort, playerIp) => {
 
 /**
  * Handle the player disconnection
- *
- * @param {Player} player
- *
- * @return {Boolean} removal status
+ * @param {Player.State} state
+ * @return {Boolean}
  */
-exports.removePlayer = ({ state }) => {
+exports.removePlayer = (state) => {
   const { lobby, id: playerId } = state;
   const { players } = lobby;
   const playerLobbyIdx = players.findIndex(player => player.state.id === playerId);
@@ -149,12 +147,11 @@ exports.removePlayer = ({ state }) => {
   if (!deletedLobby) {
     const response = Buffer.alloc(3);
     response[0] = commandIds.lobby_player_left;
-    response[1] = state.id;
+    response[1] = playerId;
     response[2] = lobby.adminId;
 
     for (let i = 0, len = players.length; i < len; i++) {
-      const player = players[i];
-      player.send(response);
+      players[i].send(response);
     }
   }
 
