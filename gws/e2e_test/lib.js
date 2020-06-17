@@ -23,8 +23,7 @@ const commands = {
   lobby_player_username: 18,
   lobby_bans: 19,
   lobby_unban: 20,
-  lobby_password: 21,
-  lobby_password_changed: 22
+  lobby_password: 21
 };
 
 const errors = [
