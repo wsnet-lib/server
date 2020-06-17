@@ -16,7 +16,7 @@ exports.handler = ({ lobby, data, state, commandId, confirmError, client }) => {
   if (!lobby.bansByIp[ipHash]) return confirmError(errors.playerNotFound);
 
   // Unban the player
-  unbanPlayer(state);
+  unbanPlayer(lobby, state.ip);
 
   // Send the confirmation to the sender
   const response = Buffer.alloc(3 + ipHash.length);
