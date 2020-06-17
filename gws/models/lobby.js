@@ -1,3 +1,4 @@
+const Quicksort = require('optimized-quicksort');
 const { commandIds } = require('../lib/commandIds');
 const { resetLobbyState } = require('./player');
 
@@ -102,11 +103,11 @@ exports.createLobby = (lobbyName, maxPlayers, client, password) => {
    * @return {Lobby}
    */
 exports.findLobby = (dateSort, maxPlayersSort, playerIp) => {
-  let lobbiesArray = Object.values(lobbies);
+  const lobbiesArray = Object.values(lobbies);
 
   // Sort the lobbies, if specified
   if (dateSort || maxPlayersSort) {
-    lobbiesArray = lobbiesArray.sort((a, b) => {
+    Quicksort.sort(lobbiesArray, (a, b) => {
       const compareDate = dateSort === 1
         ? a.createdAt - b.createdAt
         : b.createdAt - a.createdAt;
