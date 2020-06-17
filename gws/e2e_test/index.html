@@ -185,6 +185,16 @@
           if (array[1]) { error(array[1]); break }
           console.log(`Changed the lobby password in ${time()}`)
           break
+
+        case commands.lobby_username:
+          if (array[1]) { error(array[1]); break }
+          console.log(`Changed the player username in ${time()}`)
+          break
+
+        case commands.lobby_player_username:
+          if (array[1]) { error(array[1]); break }
+          console.log(`A player changed its username in ${time()}`)
+          break
       }
       console.log('---');
     }
@@ -280,6 +290,12 @@
     console.log("%cSetting the lobby password..", "color: dodgerblue")
     timeStart = Date.now()
     send(commands.lobby_password, ...string("new password"))
+  }
+
+  function testSetUsername() {
+    console.log("%cSetting the player username..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_username, ...string("new name"))
   }
 
   connect()
