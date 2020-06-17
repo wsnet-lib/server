@@ -11,17 +11,17 @@ exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confi
   // Lobby check
   if (!lobby) return confirmError(errors.lobbyNotFound);
 
-  // Set the lobby admin
+  // Set the username
   state.username = newUsername;
 
-  // Confirm the new_admin change
+  // Send the confirm
   const response = Buffer.alloc(3 + newUsername.length);
   response[0] = commandId;
   response[1] = errors.noError;
   response.write(newUsername.length + '\0');
   client.send(response);
 
-  // Broadcast the new admin to all players
+  // Broadcast the new name
   const broadcastResponse = Buffer.alloc(3 + newUsername.length);
   broadcastResponse[0] = commandIds.lobby_player_username;
   broadcastResponse[1] = state.id;
