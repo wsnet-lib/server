@@ -3,22 +3,26 @@ const { errors } = require('../lib/errors');
 /**
  * Send or broadcast a generic message
  */
-exports.handler = ({ data, lobby, state, commandId, sendBroadcast, sendError }) => {
+exports.handler = (ctx) => {
+  const { onGameMessage, data, lobby, state, commandId, sendBroadcast, sendError } = ctx;
+
   // Get the input
   const receiverId = data[1];
 
   // Get the players list
   if (!lobby) return sendError(errors.lobbyNotFound);
 
+  // Get the message data
+  const responseData = onGameMessage ? onGameMessage(ctx) : data.slice(2);
+
   // Build the response
   const responseHeader = Buffer.alloc(2);
   responseHeader[0] = commandId;
   responseHeader[1] = state.id;
-  const response = Buffer.concat([responseHeader, data.slice(2)]);
+  const response = Buffer.concat([responseHeader, responseData]);
 
   // Broadcast or send the message
   if (receiverId === 255) {
-    // Broadcast the message to the lobby players
     sendBroadcast(response);
   } else {
     // Find the receiver player

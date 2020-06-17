@@ -8,7 +8,7 @@ const { commandIds } = require('./commandIds');
  * @param {WebSocket.Client} client
  * @param {Buffer} data
  */
-exports.execCommand = (server, client, data) => {
+exports.execCommand = (server, client, data, onGameMessage) => {
   const commandId = data[0];
   const command = commandHandlers[commandId];
 
@@ -42,6 +42,7 @@ exports.execCommand = (server, client, data) => {
     data,
     server,
     client,
+    onGameMessage,
     state: client.state,
     commandId,
     lobby: client.state.lobby,

@@ -51,7 +51,7 @@ exports.start = (options = {}) => {
 
     client.on('message', (data) => {
       try {
-        execCommand(server, client, data);
+        execCommand(server, client, data, options.onGameMessage);
       } catch (err) {
         onClientError(err);
 
