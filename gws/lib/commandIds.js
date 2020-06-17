@@ -18,5 +18,7 @@ exports.commandIds = {
   lobby_kick: 15,
   lobby_player_kicked: 16,
   lobby_username: 17,
-  lobby_player_username: 18
+  lobby_player_username: 18,
+  lobby_bans: 19,
+  lobby_unban: 20
 };

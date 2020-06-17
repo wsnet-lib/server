@@ -162,3 +162,12 @@ exports.removePlayer = (state) => {
   resetLobbyState(state);
   return true;
 };
+
+/**
+ * Unban the player from the lobby
+ * @param {Lobby} lobby
+ * @param {String} ipHash
+ */
+exports.unbanPlayer = (lobby, ipHash) => {
+  delete lobby.bansByIp[ipHash];
+};

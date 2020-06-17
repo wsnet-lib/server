@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "optimized-quicksort": "1.1.1",
+    "short-hash": "^1.0.0",
     "ws": "7.2.1"
   },
   "devDependencies": {
