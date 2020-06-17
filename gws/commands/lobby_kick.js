@@ -14,6 +14,9 @@ exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confi
   if (!lobby) return confirmError(errors.lobbyNotFound);
   if (lobby.adminId !== state.id) return confirmError(errors.unauthorized);
 
+  // Player check
+  if (kickedPlayerId === state.id) return confirmError(errors.unauthorized);
+
   // Find the player
   const { players } = lobby;
   let foundPlayer;
