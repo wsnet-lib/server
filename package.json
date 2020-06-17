@@ -8,9 +8,8 @@
     "dev": "nodemon -q"
   },
   "engines": {
-    "node": "12.x"
+    "node": ">=12.x"
   },
-  "private": true,
   "keywords": [
     "node"
   ],

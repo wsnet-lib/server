@@ -17,15 +17,15 @@ exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confi
 
   // Confirm the allow join change
   const response = Buffer.alloc(3);
-  response.writeUInt8(commandId);
-  response.writeUInt8(errors.noError, 1);
-  response.writeUInt8(allowJoin, 2);
+  response[0] = commandId;
+  response[1] = errors.noError;
+  response[2] = allowJoin;
   client.send(response);
 
   // Broadcast the allow join to all players
   const broadcastResponse = Buffer.alloc(2);
-  broadcastResponse.writeUInt8(commandIds.lobby_allow_join_changed);
-  broadcastResponse.writeUInt8(allowJoin, 1);
+  broadcastResponse[0] = commandIds.lobby_allow_join_changed;
+  broadcastResponse[1] = allowJoin;
   sendBroadcast(broadcastResponse);
 };
 

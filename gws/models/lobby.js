@@ -1,4 +1,5 @@
 const { commandIds } = require('../lib/commandIds');
+const { resetLobbyState } = require('./player');
 
 /**
  * interface Lobby {
@@ -10,7 +11,10 @@ const { commandIds } = require('../lib/commandIds');
  *  maxPlayers: Number
  *  password?: String
  *  allowJoin: Boolean
- *  bans: Object<Bans>
+ *  data: LobbyData
+ *  bansIp: Object<Bans>
+ *  bansUsername: Object<Bans>
+ *  isBanned: (state: State): Boolean => {}
  * }
  */
 
@@ -59,6 +63,15 @@ exports.createLobby = (lobbyName, maxPlayers, client, password) => {
   for (let i = 254; i >= 0; i--) freeIds[i] = i;
   freeIds.shift();
 
+  /**
+   * Check if a player has been banned
+   * @param {State} state Player state
+   * @return {Boolean}
+   */
+  function isBanned(state) {
+    return this.bansIp[state.ip] || this.bansUsername[state.username];
+  }
+
   // Push the lobby
   const lobby = {
     id,
@@ -69,15 +82,15 @@ exports.createLobby = (lobbyName, maxPlayers, client, password) => {
     maxPlayers,
     password,
     allowJoin: true,
-    bans: {},
-    createdAt: new Date()
+    createdAt: new Date(),
+    data: {},
+    bansIp: {},
+    bansUsername: {},
+    isBanned
   };
   lobbies[id] = lobby;
   return lobby;
 };
-
-// Cached function
-const hasProp = Object.prototype.hasOwnProperty.bind(Object);
 
 /**
    * Find a lobby based on the sort criteria
@@ -112,7 +125,7 @@ exports.findLobby = (dateSort, maxPlayersSort, playerIp) => {
 
   // Get the first lobby not fully and without a password
   return lobbiesArray.find(
-    lobby => lobby.players.length < lobby.maxPlayers && !lobby.password && !lobby.bans[playerIp] && lobby.allowJoin
+    lobby => lobby.players.length < lobby.maxPlayers && !lobby.password && !lobby.isBanned(playerIp) && lobby.allowJoin
   );
 };
 
@@ -156,16 +169,6 @@ exports.removePlayer = (state) => {
   }
 
   // Reset the player state
-  exports.resetPlayerState(state);
+  resetLobbyState(state);
   return true;
-};
-
-/**
- * Reset the player state
- * @param {State} state
- */
-exports.resetPlayerState = (state) => {
-  delete state.id;
-  delete state.lobby;
-  delete state.username;
 };

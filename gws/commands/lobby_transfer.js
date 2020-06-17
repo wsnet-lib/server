@@ -17,15 +17,15 @@ exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confi
 
   // Confirm the new_admin change
   const response = Buffer.alloc(3);
-  response.writeUInt8(commandId);
-  response.writeUInt8(errors.noError, 1);
-  response.writeUInt8(newAdminId, 2);
+  response[0] = commandId;
+  response[1] = errors.noError;
+  response[2] = newAdminId;
   client.send(response);
 
   // Broadcast the new admin to all players
   const broadcastResponse = Buffer.alloc(2);
-  broadcastResponse.writeUInt8(commandIds.lobby_transfer_changed);
-  broadcastResponse.writeUInt8(newAdminId, 1);
+  broadcastResponse[0] = commandIds.lobby_transfer_changed;
+  broadcastResponse[1] = newAdminId;
   sendBroadcast(broadcastResponse);
 };
 

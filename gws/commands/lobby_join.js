@@ -3,9 +3,6 @@ const { errors } = require('../lib/errors');
 const { commandIds } = require('../lib/commandIds');
 const { getLobby } = require('../models/lobby');
 
-//it doesn't work for the ban check
-//const hasProp = Object.prototype.hasOwnProperty.bind(Object);
-
 /**
  * Join a lobby
  */
@@ -20,10 +17,10 @@ exports.handler = ({ client, data, state, commandId, sendBroadcast, confirmError
   if (state.lobby) return confirmError(errors.alreadyInLobby);
   const lobby = getLobby(lobbyId);
   if (!lobby) return confirmError(errors.lobbyNotFound);
-  const { password: lobbyPassword, players, maxPlayers, freeIds, bans } = lobby;
+  const { password: lobbyPassword, players, maxPlayers, freeIds, isBanned } = lobby;
 
-  // Bans/join 
-  if (bans[state.ip] || !lobby.allowJoin) return confirmError(errors.unauthorized);
+  // Bans/join
+  if (!lobby.allowJoin || isBanned(state)) return confirmError(errors.unauthorized);
 
   // Max players check
   if (players.length >= maxPlayers) {

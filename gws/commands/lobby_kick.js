@@ -1,6 +1,6 @@
 const { errors } = require('../lib/errors');
 const { commandIds } = require('../lib/commandIds');
-const { resetPlayerState } = require('../models/lobby');
+const { resetLobbyState } = require('../models/player');
 
 /**
  * Kick or ban a player
@@ -48,7 +48,7 @@ exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confi
   if (kickOrBan) lobby.bans[foundPlayer.state.ip] = true;
 
   // Kick the player
-  resetPlayerState(foundPlayer.state);
+  resetLobbyState(foundPlayer.state);
   lobby.players.splice(foundPlayerIdx, 1);
   lobby.freeIds.push(kickedPlayerId);
 };

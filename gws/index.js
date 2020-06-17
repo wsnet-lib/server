@@ -21,7 +21,7 @@ function heartbeat() {
  * @param {Object=} options
  */
 exports.start = (options = {}) => {
-  const isServerBehindProxy = options.proxy;
+  const isServerBehindProxy = options.behindProxy === undefined || options.behindProxy === 'true';
   const onClientConnection = options.onClientConnection;
   const onClientError = options.onClientError || console.error;
 
@@ -35,7 +35,9 @@ exports.start = (options = {}) => {
      * @type {ClientState}
      */
     client.state = {
-      ip: isServerBehindProxy ? req.headers['x-forwarded-for'].split(/\s*,\s*/)[0] : req.socket.remoteAddress
+      ip: isServerBehindProxy && req.headers['x-forwarded-for']
+        ? req.headers['x-forwarded-for'].split(/\s*,\s*/)[0]
+        : req.socket.remoteAddress
     };
 
     // Handle the pong event

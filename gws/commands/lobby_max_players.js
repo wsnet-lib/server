@@ -17,15 +17,15 @@ exports.handler = ({ client, state, data, commandId, lobby, sendBroadcast, confi
 
   // Confirm the max_player change
   const response = Buffer.alloc(3);
-  response.writeUInt8(commandId);
-  response.writeUInt8(errors.noError, 1);
-  response.writeUInt8(maxPlayers, 2);
+  response[0] = commandId;
+  response[1] = errors.noError;
+  response[2] = maxPlayers;
   client.send(response);
 
   // Broadcast the new max_player to all players
   const broadcastResponse = Buffer.alloc(2);
-  broadcastResponse.writeUInt8(commandIds.lobby_max_players_changed);
-  broadcastResponse.writeUInt8(maxPlayers, 1);
+  broadcastResponse[0] = commandIds.lobby_max_players_changed;
+  broadcastResponse[1] = maxPlayers;
   sendBroadcast(broadcastResponse);
 };
 
