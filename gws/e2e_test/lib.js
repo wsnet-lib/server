@@ -18,7 +18,13 @@ const commands = {
   lobby_max_players: 13,
   lobby_max_players_changed: 14,
   lobby_kick: 15,
-  lobby_player_kicked: 16
+  lobby_player_kicked: 16,
+  lobby_username: 17,
+  lobby_player_username: 18,
+  lobby_bans: 19,
+  lobby_unban: 20,
+  lobby_password: 21,
+  lobby_password_changed: 22
 };
 
 const errors = [

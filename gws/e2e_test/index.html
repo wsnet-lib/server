@@ -32,12 +32,16 @@
 <p><button onclick="testLeaveLobby()">Leave lobby</button></p>
 <p><button onclick="testListLobbies()">List lobbies</button></p>
 <p><button onclick="testLobbyTransferAdmin()">Transfer lobby admin</button></p>
-<p><button onclick="testSetAllowJoin()">Set allow join</button></p>
-<p><button onclick="testSetMaxPlayers()">Set max players</button></p>
+<p><button onclick="testSetAllowJoin()">Set lobby allow join</button></p>
+<p><button onclick="testSetMaxPlayers()">Set lobby max players</button></p>
+<p><button onclick="testSetPassword()">Set lobby password</button></p>
 <p>
   <button onclick="testKickPlayer()">Kick player</button>
   <button onclick="testBanPlayer()">Ban player</button>
 </p>
+<p><button onclick="testUnban()">Unban player</button></p>
+<p><button onclick="testGetBansList()">Get bans list</button></p>
+<p><button onclick="testSetUsername()">Set username</button></p>
 <p><button onclick="testSendMessage()">Send message</button></p>
 
 <script src="lib.js"></script>
@@ -171,6 +175,11 @@
         case commands.lobby_player_kicked:
           console.log(`${!array[2] ? "Kicked" : "Banned"} player. ID: ${array[1]}`)
           break
+
+        case commands.lobby_bans:
+          if (array[1]) { error(array[1]); break }
+          console.log(`Lobby bans list in ${time()}`)
+          break
       }
       console.log('---');
     }
@@ -254,6 +263,12 @@
     console.log("%cBanning player..", "color: dodgerblue")
     timeStart = Date.now()
     send(commands.lobby_kick, 1, 1)
+  }
+
+  function testGetBansList() {
+    console.log("%Getting the bans list..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_bans, 1, 1)
   }
 
   connect()

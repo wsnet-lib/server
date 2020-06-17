@@ -20,8 +20,7 @@ const commandHandlers = [
   null, // OutputCommand: lobby_player_username,
   require('./lobby_bans').handler,
   require('./lobby_unban').handler,
-  require('./lobby_password').handler,
-  null // OutputCommand: lobby_password_changed,
+  require('./lobby_password').handler
 ];
 
 /** Command handlers */
