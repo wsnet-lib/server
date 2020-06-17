@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const { errors } = require('../lib/errors');
 
 /**
- * Set the player username
+ * Set the lobby password
  */
 exports.handler = ({ sendConfirm, state, data, lobby, confirmError }) => {
   // Get the input
@@ -13,7 +13,7 @@ exports.handler = ({ sendConfirm, state, data, lobby, confirmError }) => {
   if (lobby.adminId !== state.id) return confirmError(errors.unauthorized);
 
   // Set the lobby password
-  lobby.password = crypto.createHash('sha1').update(newPassword).digest();
+  lobby.password = newPassword ? crypto.createHash('sha1').update(newPassword).digest() : null;
 
   // Send the confirm
   sendConfirm();
