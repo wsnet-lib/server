@@ -1,4 +1,5 @@
 const WebSocket = require('ws');
+const shortHash = require('short-hash');
 const { execCommand } = require('./lib/execCommand');
 const { errors } = require('./lib/errors');
 const { commandIds } = require('./lib/commandIds');
@@ -36,8 +37,8 @@ exports.start = (options = {}) => {
      */
     client.state = {
       ip: isServerBehindProxy && req.headers['x-forwarded-for']
-        ? req.headers['x-forwarded-for'].split(/\s*,\s*/)[0]
-        : req.socket.remoteAddress
+        ? shortHash(req.headers['x-forwarded-for'].split(/\s*,\s*/)[0])
+        : shortHash(req.socket.remoteAddress)
     };
 
     // Handle the pong event
