@@ -10,14 +10,17 @@ exports.handler = ({ client, state, lobby, commandId, confirmError }) => {
 
   // Build the response
   let size = 0;
+  let count = 0;
   for (const ipHash in lobby.bansByIp) {
     size += ipHash.length + lobby.bansByIp[ipHash].length + 2; /* 2 null chars */
+    count++;
   }
 
-  const response = Buffer.alloc(4 + size);
+  const response = Buffer.alloc(6 + size);
   response[0] = commandId;
   response[1] = errors.noError;
-  let offset = 2;
+  response.writeUInt16LE(count, 2);
+  let offset = 4;
   for (const ipHash in lobby.bansByIp) {
     /* IP Hash */
     response.write(ipHash + '\0', offset);
