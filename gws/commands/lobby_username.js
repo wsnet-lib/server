@@ -25,7 +25,7 @@ exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confi
   const broadcastResponse = Buffer.alloc(3 + newUsername.length);
   broadcastResponse[0] = commandIds.lobby_player_username;
   broadcastResponse[1] = state.id;
-  response.write(newUsername + '\0', 2);
+  broadcastResponse.write(newUsername + '\0', 2);
   sendBroadcast(broadcastResponse);
 };
 
