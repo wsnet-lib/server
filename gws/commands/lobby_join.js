@@ -20,7 +20,7 @@ exports.handler = ({ client, data, state, commandId, sendBroadcast, confirmError
   const { password: lobbyPassword, players, maxPlayers, freeIds, isBanned } = lobby;
 
   // Bans/join
-  if (!lobby.allowJoin || isBanned(state)) return confirmError(errors.unauthorized);
+  if (!lobby.allowJoin || isBanned(state.ip)) return confirmError(errors.unauthorized);
 
   // Max players check
   if (players.length >= maxPlayers) {

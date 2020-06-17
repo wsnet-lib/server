@@ -76,7 +76,7 @@ exports.createLobby = (lobbyName, maxPlayers, client, password) => {
     createdAt: new Date(),
     data: {},
     bansByIp: {},
-    isBanned: (state) => lobby.bansByIp[state.ip]
+    isBanned: (ipHash) => lobby.bansByIp[ipHash]
   };
   lobbies[id] = lobby;
   return lobby;
@@ -87,11 +87,11 @@ exports.createLobby = (lobbyName, maxPlayers, client, password) => {
    *
    * @param {Boolean} dateSort (0=disabled, 1=asc, 2=desc)
    * @param {Boolean} maxPlayersSort (0=disabled, 1=asc, 2=desc)
-   * @param {String} playerIp
+   * @param {String} ip
    *
    * @return {Lobby}
    */
-exports.findLobby = (dateSort, maxPlayersSort, playerIp) => {
+exports.findLobby = (dateSort, maxPlayersSort, ip) => {
   const lobbiesArray = Object.values(lobbies);
 
   // Sort the lobbies, if specified
@@ -115,7 +115,7 @@ exports.findLobby = (dateSort, maxPlayersSort, playerIp) => {
 
   // Get the first lobby not fully and without a password
   return lobbiesArray.find(
-    lobby => lobby.players.length < lobby.maxPlayers && !lobby.password && !lobby.isBanned(playerIp) && lobby.allowJoin
+    lobby => lobby.players.length < lobby.maxPlayers && !lobby.password && !lobby.isBanned(ip) && lobby.allowJoin
   );
 };
 
