@@ -1,5 +1,4 @@
 const { errors } = require('../lib/errors');
-const { commandIds } = require('../lib/commandIds');
 
 /**
  * Get the ban list

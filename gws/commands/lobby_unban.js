@@ -10,7 +10,7 @@ exports.handler = ({ lobby, data, state, commandId, confirmError, client }) => {
   if (lobby.adminId !== state.id) return confirmError(errors.unauthorized);
 
   // Get the input
-  const ipHash = data.slice(1, data.indexOf(0));
+  const ipHash = data.slice(1, data.indexOf(0, 1));
 
   // Player check
   if (!lobby.bansByIp[ipHash]) return confirmError(errors.playerNotFound);
