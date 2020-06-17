@@ -112,7 +112,7 @@ exports.findLobby = (dateSort, maxPlayersSort, playerIp) => {
 
   // Get the first lobby not fully and without a password
   return lobbiesArray.find(
-    lobby => lobby.players.length < lobby.maxPlayers && !lobby.password && !lobby.bans[playerIp]) && lobby.allowJoin
+    lobby => lobby.players.length < lobby.maxPlayers && !lobby.password && !lobby.bans[playerIp] && lobby.allowJoin
   );
 };
 
