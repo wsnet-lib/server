@@ -45,7 +45,7 @@ exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confi
   sendBroadcast(broadcastResponse);
 
   // Add a ban for this player if specified
-  if (kickOrBan) lobby.bans[foundPlayer.state.ip] = true;
+  if (kickOrBan) lobby.bansByIp[foundPlayer.state.ip] = true;
 
   // Kick the player
   resetLobbyState(foundPlayer.state);
