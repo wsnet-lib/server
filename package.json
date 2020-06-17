@@ -20,7 +20,7 @@
     "url": "https://github.com/gamemakernet/test"
   },
   "dependencies": {
-    "optimized-quicksort": "^1.1.1",
+    "optimized-quicksort": "1.1.1",
     "ws": "7.2.1"
   },
   "devDependencies": {
@@ -34,7 +34,7 @@
     "semistandard": "14.2.0"
   },
   "optionalDependencies": {
-    "bufferutil": "^4.0.1",
-    "utf-8-validate": "^5.0.2"
+    "bufferutil": "4.0.1",
+    "utf-8-validate": "5.0.2"
   }
 }

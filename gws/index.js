@@ -46,6 +46,17 @@ exports.start = (options = {}) => {
 
     client.on('error', (error) => {
       onClientError(error);
+
+      // Try to send a generic error to the client
+      try {
+        const errorBuffer = Buffer.alloc(2);
+        errorBuffer[0] = commandIds.error;
+        errorBuffer[1] = errors.serverError;
+        client.send(errorBuffer);
+      } catch (sendError) {
+        onClientError(sendError);
+      }
+
       client.terminate();
     });
 

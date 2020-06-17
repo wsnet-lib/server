@@ -13,8 +13,7 @@ const { resetLobbyState } = require('./player');
  *  password?: String
  *  allowJoin: Boolean
  *  data: LobbyData
- *  bansIp: Object<Bans>
- *  bansUsername: Object<Bans>
+ *  bansByIp: Object<Bans>
  *  isBanned: (state: State): Boolean => {}
  * }
  */
@@ -64,15 +63,6 @@ exports.createLobby = (lobbyName, maxPlayers, client, password) => {
   for (let i = 254; i >= 0; i--) freeIds[i] = i;
   freeIds.shift();
 
-  /**
-   * Check if a player has been banned
-   * @param {State} state Player state
-   * @return {Boolean}
-   */
-  function isBanned(state) {
-    return this.bansIp[state.ip] || this.bansUsername[state.username];
-  }
-
   // Push the lobby
   const lobby = {
     id,
@@ -85,9 +75,8 @@ exports.createLobby = (lobbyName, maxPlayers, client, password) => {
     allowJoin: true,
     createdAt: new Date(),
     data: {},
-    bansIp: {},
-    bansUsername: {},
-    isBanned
+    bansByIp: {},
+    isBanned: (state) => lobby.bansByIp[state.ip]
   };
   lobbies[id] = lobby;
   return lobby;
