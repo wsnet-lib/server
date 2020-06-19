@@ -7,8 +7,8 @@ const { findLobby } = require('../models/lobby');
  */
 exports.handler = async ({ client, data, state, sendBroadcast, confirmError }) => {
   // Get the input
-  const dateSort = data.readUInt8(1);
-  const maxPlayersSort = data.readUInt8(2);
+  const dateSort = data[1];
+  const maxPlayersSort = data[2];
   const username = data.slice(3, data.length - 1);
 
   // Get the first available lobby

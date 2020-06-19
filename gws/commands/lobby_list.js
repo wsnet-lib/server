@@ -1,4 +1,4 @@
-const { getLobbies } = require('../models/lobby');
+const { lobbies } = require('../models/lobby');
 
 /**
  * Get the lobbies list
@@ -7,10 +7,10 @@ const { getLobbies } = require('../models/lobby');
  */
 exports.handler = ({ client, commandId }) => {
   // Get the lobbies
-  const lobbies = Object.values(getLobbies());
+  const lobbiesList = Object.values(lobbies);
 
   // Calculate the payload size
-  const size = 1 + lobbies.reduce((size, lobby) => (size + lobby.name.length + 8), 0);
+  const size = 1 + lobbiesList.reduce((size, lobby) => (size + lobby.name.length + 8), 0);
 
   // Write the response buffer
   const payload = Buffer.alloc(size);
@@ -19,17 +19,16 @@ exports.handler = ({ client, commandId }) => {
   // Command ID
   payload[offset++] = commandId;
 
-  for (let i = 0, len = lobbies.length; i < len; i++) {
-    const lobby = lobbies[i];
+  for (let i = 0, len = lobbiesList.length; i < len; i++) {
+    const lobby = lobbiesList[i];
 
     // Lobby ID
     payload.writeUInt32LE(lobby.id, offset);
     offset += 4;
 
     // Lobby name
-    payload.write(lobby.name, offset);
-    offset += lobby.name.length;
-    payload[offset++] = 0;
+    payload.write(lobby.name + '\0', offset);
+    offset += lobby.name.length + 1;
 
     // Players count
     payload[offset++] = lobby.players.length;

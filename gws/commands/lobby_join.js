@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const { errors } = require('../lib/errors');
 const { commandIds } = require('../lib/commandIds');
-const { getLobby } = require('../models/lobby');
+const { lobbies } = require('../models/lobby');
 
 /**
  * Join a lobby
@@ -15,7 +15,7 @@ exports.handler = ({ client, data, state, commandId, sendBroadcast, confirmError
 
   // Lobby check
   if (state.lobby) return confirmError(errors.alreadyInLobby);
-  const lobby = getLobby(lobbyId);
+  const lobby = lobbies[lobbyId];
   if (!lobby) return confirmError(errors.lobbyNotFound);
   const { password: lobbyPassword, players, maxPlayers, freeIds, isBanned } = lobby;
 

@@ -4,7 +4,7 @@ const { errors } = require('../lib/errors');
  * Send or broadcast a generic message
  */
 exports.handler = (ctx) => {
-  const { onGameMessage, data, lobby, state, commandId, sendBroadcast, sendError } = ctx;
+  const { onGameMessage, data, lobby, state, client, sendError } = ctx;
 
   // Get the input
   const receiverId = data[1];
@@ -12,27 +12,36 @@ exports.handler = (ctx) => {
   // Get the players list
   if (!lobby) return sendError(errors.lobbyNotFound);
 
-  // Get the message data
-  const responseData = onGameMessage ? onGameMessage(ctx) : data.slice(2);
+  // Get the transformed response
+  const response = onGameMessage ? onGameMessage(ctx) : data;
 
-  // Build the response
-  const responseHeader = Buffer.alloc(2);
-  responseHeader[0] = commandId;
-  responseHeader[1] = state.id;
-  const response = Buffer.concat([responseHeader, responseData]);
+  // Overwrite the receiver with the sender ID
+  response[1] = state.id;
 
   // Broadcast or send the message
+  const { players } = lobby;
+
   if (receiverId === 255) {
-    sendBroadcast(response);
+    for (let i = 0, len = players.length; i < len; i++) {
+      const player = players[i];
+      client !== player && player.send(response);
+    }
   } else {
     // Find the receiver player
-    const receiver = lobby.players.find(player => player.state.id === receiverId);
+    let receiverPlayer;
+    for (let i = 0, len = players.length; i < len; i++) {
+      const player = players[i];
+      if (player.state.id === receiverId) {
+        receiverPlayer = player;
+        break;
+      }
+    }
 
     // If the receiver does not exists anymore, send an error to the sender
-    if (!receiver) return sendError(errors.playerNotFound);
+    if (!receiverPlayer) return sendError(errors.playerNotFound);
 
     // Send the message to the receiver
-    receiver.send(response);
+    receiverPlayer.send(response);
   }
 };
 

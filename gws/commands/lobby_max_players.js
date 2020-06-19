@@ -6,7 +6,7 @@ const { commandIds } = require('../lib/commandIds');
  */
 exports.handler = ({ client, state, data, commandId, lobby, sendBroadcast, confirmError }) => {
   // Get the input
-  const maxPlayers = data.readUInt8(1);
+  const maxPlayers = data[1];
 
   // Lobby check
   if (!lobby) return confirmError(errors.lobbyNotFound);

@@ -9,12 +9,12 @@ exports.handler = ({ data, state, lobby, client, commandId, confirmError }) => {
   if (lobby) return confirmError(errors.alreadyInLobby);
 
   // Get the lobby name
-  let nullCharIndex = data.indexOf(0);
+  let nullCharIndex = data.indexOf(0, 1);
   const lobbyName = data.slice(1, nullCharIndex).toString();
   let offset = nullCharIndex + 1;
 
   // Get the max players
-  const maxPlayers = data.readUInt8(offset++);
+  const maxPlayers = data[offset++];
 
   // Get the admin name
   nullCharIndex = data.indexOf(0, offset);

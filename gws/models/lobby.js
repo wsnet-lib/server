@@ -19,31 +19,10 @@ const { resetLobbyState } = require('./player');
  */
 
 /** Lobby list */
-const lobbies = {};
+const lobbies = exports.lobbies = {};
 
 /** Lobby Increment ID */
 let lobbyAutoIncrement = 0;
-
-/**
- * Get the lobbies list
- * @return Lobby[]
- */
-exports.getLobbies = () => lobbies;
-
-/**
- * Get a lobby
- * @param {Number} id
- * @return Lobby
- */
-exports.getLobby = (id) => lobbies[id];
-
-/**
- * Delete a lobby
- * @param {Number} id
- */
-exports.deleteLobby = (id) => {
-  delete lobbies[id];
-};
 
 /**
  * Create a lobby, if not already in a lobby
@@ -142,7 +121,7 @@ exports.removePlayer = (state) => {
       lobby.adminId = players[0].state.id;
     }
   } else {
-    exports.deleteLobby(lobby.id);
+    delete lobbies[lobby.id];
     deletedLobby = true;
   }
 

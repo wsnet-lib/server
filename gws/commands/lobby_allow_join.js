@@ -6,7 +6,7 @@ const { commandIds } = require('../lib/commandIds');
  */
 exports.handler = ({ client, state, data, lobby, commandId, sendBroadcast, confirmError }) => {
   // Get the input
-  const allowJoin = data.readUInt8(1);
+  const allowJoin = data[1];
 
   // Lobby check
   if (!lobby) return confirmError(errors.lobbyNotFound);
