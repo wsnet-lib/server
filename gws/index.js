@@ -4,6 +4,7 @@ const { execCommand } = require('./lib/execCommand');
 const { errors } = require('./lib/errors');
 const { commandIds } = require('./lib/commandIds');
 const { removePlayer } = require('./models/lobby');
+const { getPlayer } = require('./models/player');
 
 /** @type {WebSocket.Server} */
 let server;
@@ -25,6 +26,7 @@ exports.start = (options = {}) => {
   const isServerBehindProxy = options.behindProxy === undefined || options.behindProxy === 'true';
   const onClientConnection = options.onClientConnection;
   const onClientError = options.onClientError || console.error;
+  const autoReconnectPlayers = options.autoReconnectPlayers === 'true';
 
   server = new WebSocket.Server({
     port: options.port || 8080
@@ -35,11 +37,12 @@ exports.start = (options = {}) => {
      * Client player state
      * @type {ClientState}
      */
-    client.state = {
-      ip: isServerBehindProxy && req.headers['x-forwarded-for']
+    client.state = getPlayer(
+      isServerBehindProxy && req.headers['x-forwarded-for']
         ? shortHash(req.headers['x-forwarded-for'].split(/\s*,\s*/)[0])
-        : shortHash(req.socket.remoteAddress)
-    };
+        : shortHash(req.socket.remoteAddress),
+      autoReconnectPlayers
+    );
 
     // Handle the pong event
     client.isAlive = true;
@@ -80,7 +83,7 @@ exports.start = (options = {}) => {
     });
 
     // Handle the client disconnection
-    client.on('close', () => client.state.lobby && removePlayer(client.state));
+    client.on('close', () => !autoReconnectPlayers && client.state.lobby && removePlayer(client.state));
 
     onClientConnection && onClientConnection(client, req);
   });

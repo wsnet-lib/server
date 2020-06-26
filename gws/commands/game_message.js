@@ -11,6 +11,7 @@ exports.handler = (ctx) => {
 
   // Get the players list
   if (!lobby) return sendError(errors.lobbyNotFound);
+  const { players } = lobby;
 
   // Get the transformed response
   const response = onGameMessage ? onGameMessage(ctx) : data;
@@ -19,8 +20,6 @@ exports.handler = (ctx) => {
   response[1] = state.id;
 
   // Broadcast or send the message
-  const { players } = lobby;
-
   if (receiverId === 255) {
     for (let i = 0, len = players.length; i < len; i++) {
       const player = players[i];

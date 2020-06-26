@@ -34,11 +34,11 @@ exports.handler = ({ data, state, lobby, client, commandId, confirmError }) => {
   state.lobby = createdLobby;
 
   // Send the response
-  const payload = Buffer.alloc(4 + adminName.length);
+  const payload = Buffer.alloc(7 + adminName.length);
   payload[0] = commandId;
   payload[1] = errors.noError;
-  payload[2] = createdLobby.id;
-  payload.write(adminName + '\0', 3);
+  payload.writeUInt32LE(createdLobby.id, 2);
+  payload.write(adminName + '\0', 6);
 
   client.send(payload);
 };
@@ -54,6 +54,6 @@ interface Input {
 interface Output {
   commandId       u8
   error           u8
-  lobbyId         u8
+  lobbyId         u32
   playerName      string
 */
