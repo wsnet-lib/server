@@ -91,14 +91,15 @@ exports.start = (options = {}) => {
     for (const client of server.clients) {
       if (!client.isAlive) {
         client.close();
-        return client.terminate();
+        setTimeout(() => client.terminate(), 5000);
+        return;
       }
 
       client.isAlive = false;
       console.debug(`[PING] Sending ping message to the client ${client.state.ip}`);
       client.ping();
     }
-  }, options.pingInterval || 15000);
+  }, options.pingInterval || 30000);
 
   server.on('close', () => {
     clearInterval(interval);
