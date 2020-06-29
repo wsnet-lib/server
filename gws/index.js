@@ -89,12 +89,16 @@ exports.start = (options = {}) => {
   // Ping handler
   const interval = setInterval(() => {
     for (const client of server.clients) {
-      if (!client.isAlive) return client.terminate();
+      if (!client.isAlive) {
+        client.close();
+        return client.terminate();
+      }
+
       client.isAlive = false;
       console.debug(`[PING] Sending ping message to the client ${client.state.ip}`);
       client.ping();
     }
-  }, options.pingInterval || 5000);
+  }, options.pingInterval || 15000);
 
   server.on('close', () => {
     clearInterval(interval);
