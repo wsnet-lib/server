@@ -89,10 +89,12 @@ exports.start = (options = {}) => {
   // Ping handler
   const interval = setInterval(() => {
     for (const client of server.clients) {
+      if (client.readyState === WebSocket.CLOSING || client.readyState === WebSocket.CLOSED) continue;
+
       if (!client.isAlive) {
         console.debug(`[CLIENT] Client did not sent a pong event, gracefully closing the connection.. ${client.state.ip}`);
         client.close();
-        return;
+        continue;
       }
 
       client.isAlive = false;
