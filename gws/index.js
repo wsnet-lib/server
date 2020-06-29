@@ -99,7 +99,7 @@ exports.start = (options = {}) => {
       console.debug(`[PING] Sending ping message to the client ${client.state.ip}`);
       client.ping();
     }
-  }, options.pingInterval || 8000);
+  }, options.pingInterval || 30000);
 
   server.on('close', () => {
     clearInterval(interval);
