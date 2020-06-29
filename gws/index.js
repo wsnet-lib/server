@@ -90,8 +90,8 @@ exports.start = (options = {}) => {
   const interval = setInterval(() => {
     for (const client of server.clients) {
       if (!client.isAlive) {
-        client.close();
-        setTimeout(() => client.terminate(), 5000);
+        client.close(1000, 'Closing..');
+        // setTimeout(() => client.terminate(), 3000);
         return;
       }
 
@@ -99,7 +99,7 @@ exports.start = (options = {}) => {
       console.debug(`[PING] Sending ping message to the client ${client.state.ip}`);
       client.ping();
     }
-  }, options.pingInterval || 30000);
+  }, options.pingInterval || 8000);
 
   server.on('close', () => {
     clearInterval(interval);
