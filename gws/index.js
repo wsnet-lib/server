@@ -42,7 +42,7 @@ exports.start = (options = {}) => {
     // Set the user connection to alive after a pong event
     client.isAlive = true;
     client.on('pong', () => {
-      console.debug(`[PONG] Received pong event from client ${client.state.ip}`);
+      console.debug(`[CLIENT] Received pong event from client ${client.state.ip}`);
       client.isAlive = true;
     });
 
@@ -90,16 +90,16 @@ exports.start = (options = {}) => {
   const interval = setInterval(() => {
     for (const client of server.clients) {
       if (!client.isAlive) {
-        client.close(1000, 'Closing..');
-        // setTimeout(() => client.terminate(), 3000);
+        console.debug(`[CLIENT] Client did not sent a pong event, gracefully closing the connection.. ${client.state.ip}`);
+        client.close();
         return;
       }
 
       client.isAlive = false;
-      console.debug(`[PING] Sending ping message to the client ${client.state.ip}`);
+      console.debug(`[CLIENT] Sending ping message to the client ${client.state.ip}`);
       client.ping();
     }
-  }, options.pingInterval || 30000);
+  }, options.pingInterval || 5000);
 
   server.on('close', () => {
     clearInterval(interval);
