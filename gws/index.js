@@ -14,11 +14,6 @@ let server;
  */
 exports.getServer = () => server;
 
-/* Set the user connection to alive after a pong event */
-function heartbeat() {
-  this.isAlive = true;
-}
-
 /** Start the server
  * @param {Object=} options
  */
@@ -44,9 +39,12 @@ exports.start = (options = {}) => {
       autoReconnectPlayers
     );
 
-    // Handle the pong event
+    // Set the user connection to alive after a pong event
     client.isAlive = true;
-    client.on('pong', heartbeat);
+    client.on('pong', () => {
+      console.debug(`[PONG] Received pong event from client ${client.state.ip}`);
+      client.isAlive = true;
+    });
 
     client.on('error', (error) => {
       onClientError(error);
@@ -90,14 +88,13 @@ exports.start = (options = {}) => {
 
   // Ping handler
   const interval = setInterval(() => {
-    const clients = server.clients;
-    for (let i = 0; i < clients.length; i++) {
-      const client = clients[i];
+    for (const client of server.clients) {
       if (!client.isAlive) return client.terminate();
       client.isAlive = false;
+      console.debug(`[PING] Sending ping message to the client ${client.state.ip}`);
       client.ping();
     }
-  }, options.pingInterval || 30000);
+  }, options.pingInterval || 5000);
 
   server.on('close', () => {
     clearInterval(interval);
