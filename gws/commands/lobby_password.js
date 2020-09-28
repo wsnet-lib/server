@@ -6,7 +6,7 @@ const { errors } = require('../lib/errors');
  */
 exports.handler = ({ sendConfirm, state, data, lobby, confirmError }) => {
   // Get the input
-  const newPassword = data.slice(1, data.indexOf(0, 1));
+  const newPassword = data.slice(1, data.indexOf(0, 1)).toString() || null;
 
   // Lobby check
   if (!lobby) return confirmError(errors.lobbyNotFound);

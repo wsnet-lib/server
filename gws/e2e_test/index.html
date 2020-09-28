@@ -35,6 +35,7 @@
 <p><button onclick="testSetAllowJoin()">Set lobby allow join</button></p>
 <p><button onclick="testSetMaxPlayers()">Set lobby max players</button></p>
 <p><button onclick="testSetLobbyPassword()">Set lobby password</button></p>
+<p><button onclick="testRemoveLobbyPassword()">Remove lobby password</button></p>
 <p>
   <button onclick="testKickPlayer()">Kick player</button>
   <button onclick="testBanPlayer()">Ban player</button>
@@ -292,7 +293,14 @@
   function testSetLobbyPassword() {
     console.log("%cSetting the lobby password..", "color: dodgerblue")
     timeStart = Date.now()
+    send(commands.lobby_password, [])
     send(commands.lobby_password, ...string("new password"))
+  }
+
+  function testRemoveLobbyPassword() {
+    console.log("%cRemoving the lobby password..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_password, [])
   }
 
   function testSetUsername() {

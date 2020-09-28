@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node .",
-    "dev": "nodemon -q"
+    "watch": "nodemon -q"
   },
   "engines": {
     "node": ">=12.x"

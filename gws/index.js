@@ -92,7 +92,7 @@ exports.start = (options = {}) => {
       if (client.readyState === WebSocket.CLOSING || client.readyState === WebSocket.CLOSED) continue;
 
       if (!client.isAlive) {
-        console.debug(`[CLIENT] Client did not sent a pong event, gracefully closing the connection.. ${client.state.ip}`);
+        console.debug(`[CLIENT] Pong event not received from client ${client.state.ip}, gracefully closing the connection`);
         client.close();
         continue;
       }
