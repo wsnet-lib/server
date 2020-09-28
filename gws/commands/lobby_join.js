@@ -80,8 +80,8 @@ interface SenderOutput {
   commandId           u8
   error               u8
   lobbyId             u32
-  adminId             u8
   playerId            u8
+  adminId             u8
   playersCount        u8
   [
     playerId          u8
