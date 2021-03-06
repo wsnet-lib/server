@@ -1,0 +1,10 @@
+{
+  "env": {
+    "node": true,
+    "browser": true
+  },
+  "extends": "semistandard",
+  "rules": {
+    "space-before-function-paren": 0
+  }
+}

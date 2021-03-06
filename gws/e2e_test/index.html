@@ -1,0 +1,319 @@
+<style>
+  body {
+    background: #222;
+    color: #ddd;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .logo {
+    color: dodgerblue;
+  }
+</style>
+
+<h3>
+  <pre class="logo">  ________   __      __    _________
+  /  _____/  /  \    /  \  /   _____/
+  /   \  ___  \   \/\/   /  \_____  \ 
+  \    \_\  \  \        /   /        \
+  \______  /   \__/\  /   /_______  /
+         \/         \/            \/ </pre>
+
+  E2E Testing
+</h3>
+<p>
+  <button onclick="testCreateLobby()">Create lobby</button>
+  <button onclick="testCreateLobbyWithPsw()">Create lobby with password</button>
+</p>
+<p>
+  <button onclick="testJoinLobby()">Join lobby</button>
+  <button onclick="testJoinLobbyWithPsw()">Join lobby with password</button>
+</p>
+<p><button onclick="testAutoJoinLobby()">Auto join lobby</button></p>
+<p><button onclick="testLeaveLobby()">Leave lobby</button></p>
+<p><button onclick="testListLobbies()">List lobbies</button></p>
+<p><button onclick="testLobbyTransferAdmin()">Transfer lobby admin</button></p>
+<p><button onclick="testSetAllowJoin()">Set lobby allow join</button></p>
+<p><button onclick="testSetMaxPlayers()">Set lobby max players</button></p>
+<p><button onclick="testSetLobbyPassword()">Set lobby password</button></p>
+<p><button onclick="testRemoveLobbyPassword()">Remove lobby password</button></p>
+<p>
+  <button onclick="testKickPlayer()">Kick player</button>
+  <button onclick="testBanPlayer()">Ban player</button>
+</p>
+<p><button onclick="testGetBansList()">Get bans list</button></p>
+<p><button onclick="testUnban()">Unban player</button></p>
+<p><button onclick="testSetUsername()">Set username</button></p>
+<p><button onclick="testSendMessage()">Send message</button></p>
+
+<script src="lib.js"></script>
+
+<script>
+  let timeStart
+  let ws
+  let send
+
+  // WebSocket
+  function connect() {
+    timeStart = new Date()
+    ws = new WebSocket("ws://localhost:8080")
+    // ws = new WebSocket("wss://heroku-test-poll.herokuapp.com")
+    ws.binaryType = 'arraybuffer'
+    send = sendBuffer.bind(null, ws)
+
+    ws.onopen = () => {
+      console.log(`%c🛈 Connection established in ${time()}`, "color: lime")
+    }
+
+    ws.onclose = () => {
+      console.log("%c⚠️ Connection failed or lost. Attempt to reconnect in 2 seconds", "color: red")
+      setTimeout(connect, 2000);
+    }
+
+    ws.onmessage = ({ data }) => {
+      const array = decodeMessage(data)
+      console.log(`On event '${Object.keys(commands)[array[0]]}':`, array)
+
+      switch (array[0]) {
+        case commands.error:
+          error(array[1])
+          break
+
+        case commands.lobby_create:
+          if (array[1]) { error(array[1]); break }
+          console.log(`Lobby created in ${time()}. ID: ${array[2]}`)
+          break;
+
+        case commands.lobby_leave:
+          if (array[1]) { error(array[1]); break }
+          console.log(`Lobby left in ${time()}. ID: ${array[1]}`)
+          break;
+
+        case commands.lobby_list:
+          // Parse the lobbies
+          let lobbyCount = 0
+          const lobbies = []
+          let offset = 1
+          while (offset < array.length - 1) {
+            lobbyCount++
+
+            // Get the lobby ID
+            const lobbyId = u32ToNum(array.slice(offset, offset + 4))
+            offset += 4
+
+            // Get the lobby name
+            const nullChar = array.indexOf(0, offset)
+            const lobbyName = arrayToString(array.slice(offset, nullChar))
+            offset += lobbyName.length + 1
+
+            // Get the players count
+            const playersCount = array[offset++]
+
+            // Get the max players
+            const maxPlayers = array[offset++]
+
+            // Has password
+            const hasPassword = array[offset++]
+
+            lobbies.push({
+              id: lobbyId,
+              name: lobbyName,
+              players: playersCount,
+              maxPlayers,
+              hasPassword
+            })
+          }
+
+          console.log(`Lobby list in ${time()}. Lobbies found: ${lobbyCount}`)
+          console.dir(JSON.stringify(lobbies, null, 2))
+          break;
+
+        case commands.game_message:
+          const str = String.fromCharCode.apply(null, new Uint8Array(array.slice(2)));
+          console.log(`Received message: ${str}`)
+          break
+
+        case commands.lobby_allow_join:
+          if (array[1]) { error(array[1]); break }
+          console.log(`Set lobby allowJoin in ${time()}`)
+          break
+
+        case commands.lobby_max_players:
+          if (array[1]) { error(array[1]); break }
+          console.log(`Set lobby maxPlayers in ${time()}`)
+          break
+
+        case commands.lobby_join:
+          if (array[1]) { error(array[1]); break }
+          console.log(`Lobby joined in ${time()}`)
+          break
+
+        case commands.lobby_transfer:
+          if (array[1]) { error(array[1]); break }
+          console.log(`Lobby admin transfered in ${time()}`)
+          break
+
+        case commands.lobby_kick:
+          if (array[1]) { error(array[1]); break }
+          console.log(`${!array[3] ? "Kicked" : "Banned"} player in ${time()}`)
+          break
+
+        case commands.lobby_player_joined:
+          console.log(`Player has joined`)
+          break
+
+        case commands.lobby_player_left:
+          console.log(`Player has left`)
+          break
+
+        case commands.lobby_allow_join_changed:
+          console.log(`Admin has set lobby allowJoin flag`)
+          break
+
+        case commands.lobby_max_players_changed:
+          console.log(`Admin has set lobby maxPlayers flag`)
+          break
+
+        case commands.lobby_player_kicked:
+          console.log(`${!array[2] ? "Kicked" : "Banned"} player. ID: ${array[1]}`)
+          break
+
+        case commands.lobby_bans:
+          if (array[1]) { error(array[1]); break }
+          console.log(`Lobby bans list in ${time()}`)
+          break
+
+        case commands.lobby_password:
+          if (array[1]) { error(array[1]); break }
+          console.log(`Changed the lobby password in ${time()}`)
+          break
+
+        case commands.lobby_username:
+          if (array[1]) { error(array[1]); break }
+          console.log(`Changed the player username in ${time()}`)
+          break
+
+        case commands.lobby_player_username:
+          console.log(`A player changed its username`)
+          break
+
+        case commands.lobby_unban:
+          if (array[1]) { error(array[1]); break }
+          console.log(`Unbanned player in ${time()}`)
+          break
+      }
+      console.log('---');
+    }
+  }
+
+  // Functions
+  function testCreateLobby() {
+    console.log("%cCreating lobby..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_create, ...string("lobby1"), 32, ...string("gino"))
+  }
+
+  function testCreateLobbyWithPsw() {
+    console.log("%cCreating lobby with password..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_create, ...string("Lobby"), 32, ...string("John"), ...string("password"))
+  }
+
+  function testSendMessage() {
+    console.log("%cSending message..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.game_message, 1, ...string("Hello world!"))
+  }
+
+  function testSetAllowJoin() {
+    console.log("%cSetting lobby flag: allowJoin..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_allow_join, 1)
+  }
+
+  function testSetMaxPlayers() {
+    console.log("%cSetting lobby flag: maxPlayers..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_max_players, 8)
+  }
+
+  function testLeaveLobby() {
+    console.log("%cLeaving lobby..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_leave)
+  }
+
+  function testListLobbies() {
+    console.log("%cGetting the lobby list..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_list)
+  }
+
+  function testJoinLobby() {
+    console.log("%cJoining the lobby..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_join, ...string("Harry"), ...u32(0))
+  }
+
+  function testJoinLobbyWithPsw() {
+    console.log("%cJoining the lobby with password..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_join, ...string("Harry"), ...u32(0), ...string("password"))
+  }
+
+  function testAutoJoinLobby() {
+    console.log("%cAuto joining a lobby..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_join_auto, 1, 1, ...string("Harry"))
+  }
+
+  function testLobbyTransferAdmin() {
+    console.log("%cTransfer lobby admin to player 1..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_transfer, 1)
+  }
+
+  function testKickPlayer() {
+    console.log("%cKicking player..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_kick, 1, 0)
+  }
+
+  function testBanPlayer() {
+    console.log("%cBanning player..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_kick, 1, 1)
+  }
+
+  function testGetBansList() {
+    console.log("%cGetting the bans list..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_bans)
+  }
+
+  function testSetLobbyPassword() {
+    console.log("%cSetting the lobby password..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_password, [])
+    send(commands.lobby_password, ...string("new password"))
+  }
+
+  function testRemoveLobbyPassword() {
+    console.log("%cRemoving the lobby password..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_password, [])
+  }
+
+  function testSetUsername() {
+    console.log("%cSetting the player username..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_username, ...string("new name"))
+  }
+
+  function testUnban() {
+    console.log("%cUnbanning the player..", "color: dodgerblue")
+    timeStart = Date.now()
+    send(commands.lobby_unban, ...string("test"))
+  }
+
+  connect()
+</script>
