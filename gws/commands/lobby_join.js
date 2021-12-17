@@ -48,8 +48,8 @@ exports.handler = ({ client, data, state, commandId, sendBroadcast, confirmError
   senderResponse[0] = commandId;
   senderResponse[1] = errors.noError;
   senderResponse.writeUInt32LE(lobbyId, 2);
-  senderResponse[6] = playerId;
-  senderResponse[7] = lobby.adminId;
+  senderResponse[6] = lobby.adminId;
+  senderResponse[7] = playerId;
   senderResponse[8] = players.length;
   let offset = 9;
   players.forEach(player => {
