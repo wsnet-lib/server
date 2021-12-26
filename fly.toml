@@ -1,0 +1,16 @@
+app = "muddy-hill-983"
+
+kill_signal = "SIGINT"
+kill_timeout = 300
+processes = []
+
+[env]
+  ADDRESS = "fly-global-services"
+  PORT = 53
+
+[[services]]
+  internal_port = 53
+  protocol = "udp"
+
+  [[services.ports]]
+    port = "53"

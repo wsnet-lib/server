@@ -1,6 +1,6 @@
 {
-  "name": "gws-server",
-  "version": "1.0.0",
+  "name": "wsnet-server",
+  "version": "2.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gamemakernet/test"
+    "url": "https://github.com/wsnet-lib/server"
   },
   "dependencies": {
     "optimized-quicksort": "1.1.1",
