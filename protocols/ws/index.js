@@ -43,13 +43,11 @@ exports.start = (options = {}) => {
     );
 
     // Set the user connection to alive after a pong event
-    client.isAlive = true;
-    client.pinged = false;
+    client.isAliveAt = +new Date();
 
     client.on('pong', () => {
       onDebug(`Received pong event from client ${client.state.ip}`);
-      client.isAlive = true;
-      client.pinged = true;
+      client.isAliveAt = +new Date();
     });
 
     client.on('error', (error) => {
@@ -87,7 +85,13 @@ exports.start = (options = {}) => {
     });
 
     // Handle the client disconnection
-    client.on('close', () => !autoReconnectPlayers && client.state.lobby && removePlayer(client.state));
+    client.on('close', () => {
+      client.closed = true;
+
+      if (!autoReconnectPlayers && client.state.lobby) {
+        removePlayer(client, 0);
+      }
+    });
 
     onClientConnection && onClientConnection(client, req);
 

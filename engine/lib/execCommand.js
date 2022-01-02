@@ -2,6 +2,7 @@ const { errors } = require('./errors');
 const { commandHandlers } = require('../commands');
 const { commandIds } = require('./commandIds');
 const { appendUdpHeader } = require('./appendUdpHeader');
+const { createNetBuffer } = require('./buffer');
 
 /**
  * Execute the command based on the payload event ID
@@ -11,6 +12,7 @@ const { appendUdpHeader } = require('./appendUdpHeader');
  * @param {Function} onGameMessage
  */
 exports.execCommand = ({ server, client, data, onGameMessage, packetId, reliable }, options = {}) => {
+  client.isAliveAt = +new Date();
   const commandId = data[0];
   const command = commandHandlers[commandId];
 
@@ -45,6 +47,18 @@ exports.execCommand = ({ server, client, data, onGameMessage, packetId, reliable
   // Send an error if the command does not exists
   if (!command) return sendError(packetId, errors.commandNotFound);
 
+  /**
+   * Broadcast the message to all lobby clients, except the sender one.
+   * @param {Buffer} response
+   */
+  const sendBroadcast = (response) => {
+    const { players } = client.state.lobby;
+    for (let i = 0, len = players.length; i < len; i++) {
+      const player = players[i];
+      client !== player && player.send(response);
+    }
+  };
+
   // Execute the command
   return command({
     data,
@@ -57,9 +71,6 @@ exports.execCommand = ({ server, client, data, onGameMessage, packetId, reliable
     lobby: client.state.lobby,
     sendError,
     sendConfirmWithError,
-    udpHeaderSize,
-    packetId,
-    reliable,
 
     /**
      * Send the confirmation to the sender
@@ -72,18 +83,18 @@ exports.execCommand = ({ server, client, data, onGameMessage, packetId, reliable
       client.send(confirm);
     },
 
-    /**
-     * Broadcast the message to all lobby clients, except the sender one.
-     * @param {Buffer} response
-     */
-    sendBroadcast: (response) => {
-      const { players } = client.state.lobby;
-      for (let i = 0, len = players.length; i < len; i++) {
-        const player = players[i];
-        client !== player && player.send(response);
-      }
-    },
+    sendBroadcast, // @deprecated: use createBuffer()
 
-    appendUdpHeader: (data) => appendUdpHeader(client, data)
+    /**
+     * Create a wrapper for the buffer creation
+     * @param {Integer} size Buffer size
+     * @param {Integer} [reliable] Reliable flag
+     */
+    createBuffer: (size, reliable = 2) => (createNetBuffer(client, sendBroadcast, udpHeaderSize, size, reliable)),
+
+    // UDP data
+    packetId,
+    udpHeaderSize,
+    appendUdpHeader: (data) => appendUdpHeader(client, data) // @deprecated: use createBuffer()
   });
 };

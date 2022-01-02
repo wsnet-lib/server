@@ -33,7 +33,6 @@ exports.sendLobbyDataBuffer = ({ client, udpHeaderSize, appendUdpHeader }) => {
       buffer.write(player.state.username + '\0', offset);
       offset += player.state.username.length + 1;
     });
-    buffer.forEach(byte => console.log);
 
     client.send(buffer);
   }

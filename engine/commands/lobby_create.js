@@ -5,7 +5,7 @@ const { createLobby } = require('../models/lobby');
 /**
  * Create a lobby
  */
-exports.handler = ({ data, state, lobby, client, commandId, sendConfirmWithError, udpHeaderSize, appendUdpHeader }) => {
+exports.handler = ({ data, state, lobby, client, commandId, sendConfirmWithError, udpHeaderSize, createBuffer }) => {
   if (lobby) return sendConfirmWithError(errors.alreadyInLobby);
 
   // Get the lobby name
@@ -22,7 +22,7 @@ exports.handler = ({ data, state, lobby, client, commandId, sendConfirmWithError
   offset = nullCharIndex + 1;
 
   // Get the password and hash it (if specified)
-  let password = data.slice(offset, data.length - 1).toString() || null;
+  let password = data.slice(offset, data.length - 1 - udpHeaderSize).toString() || null;
   if (password) password = crypto.createHash('sha1').update(password).digest();
 
   // Create the lobby
@@ -34,14 +34,12 @@ exports.handler = ({ data, state, lobby, client, commandId, sendConfirmWithError
   state.lobby = createdLobby;
 
   // Send the response
-  const payload = Buffer.allocUnsafe(7 + adminName.length + udpHeaderSize);
-  payload[0] = commandId;
-  payload[1] = errors.noError;
-  payload.writeUInt32LE(createdLobby.id, 2);
-  payload.write(adminName + '\0', 6);
-  if (udpHeaderSize) appendUdpHeader(payload);
-
-  client.send(payload);
+  const payload = createBuffer(7 + adminName.length);
+  payload.writeU8(commandId);
+  payload.writeU8(errors.noError);
+  payload.writeU32(createdLobby.id);
+  payload.writeString(adminName);
+  payload.send();
 };
 
 /**

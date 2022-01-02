@@ -7,13 +7,13 @@ const { lobbies } = require('../models/lobby');
  * Join a lobby
  */
 exports.handler = ({
-  client, data, state, commandId, sendBroadcast, sendConfirmWithError, udpHeaderSize, appendUdpHeader
+  client, data, state, commandId, sendConfirmWithError, udpHeaderSize, createBuffer
 }) => {
   // Get the input
   const nullCharIndex = data.indexOf(0, 1);
   const username = data.slice(1, nullCharIndex).toString();
   const lobbyId = data.readUInt32LE(nullCharIndex + 1);
-  const inputLobbyPassword = data.slice(nullCharIndex + 5, data.length - 1).toString();
+  const inputLobbyPassword = data.slice(nullCharIndex + 5, data.length - 1 - udpHeaderSize).toString();
 
   // Lobby check
   if (state.lobby) return sendConfirmWithError(errors.alreadyInLobby);
@@ -46,30 +46,25 @@ exports.handler = ({
 
   // Build the sender response
   const size = 9 + players.reduce((size, player) => (size + player.state.username.length + 2), 0);
-  const senderResponse = Buffer.allocUnsafe(size + udpHeaderSize);
-  senderResponse[0] = commandId;
-  senderResponse[1] = errors.noError;
-  senderResponse.writeUInt32LE(lobbyId, 2);
-  senderResponse[6] = lobby.adminId;
-  senderResponse[7] = playerId;
-  senderResponse[8] = players.length;
-  let offset = 9;
+  const senderResponse = createBuffer(size);
+  senderResponse.writeU8(commandId);
+  senderResponse.writeU8(errors.noError);
+  senderResponse.writeU32(lobbyId);
+  senderResponse.writeU8(lobby.adminId);
+  senderResponse.writeU8(playerId);
+  senderResponse.writeU8(players.length);
   players.forEach(player => {
-    senderResponse[offset++] = player.state.id;
-    senderResponse.write(player.state.username + '\0', offset);
-    offset += player.state.username.length + 1;
+    senderResponse.writeU8(player.state.id);
+    senderResponse.writeString(player.state.username);
   });
-
-  if (udpHeaderSize) appendUdpHeader(senderResponse);
-  client.send(senderResponse);
+  senderResponse.send();
 
   // Broadcast the message
-  const broadcastResponse = Buffer.allocUnsafe(3 + username.length + udpHeaderSize);
-  broadcastResponse[0] = commandIds.lobby_player_joined;
-  broadcastResponse[1] = playerId;
-  broadcastResponse.write(username + '\0', 2);
-  if (udpHeaderSize) appendUdpHeader(broadcastResponse);
-  sendBroadcast(broadcastResponse);
+  const broadcastResponse = createBuffer(3 + username.length);
+  broadcastResponse.writeU8(commandIds.lobby_player_joined);
+  broadcastResponse.writeU8(playerId);
+  broadcastResponse.writeString(username);
+  broadcastResponse.broadcast();
 };
 
 /**

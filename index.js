@@ -13,24 +13,34 @@ start({
   port: process.env.PORT ?? 8080,
   behindProxy: process.env.BEHIND_PROXY,
 
-  onClientConnection({ address, port }) {
-    console.debug(`[${protocol.toUpperCase()} SERVER] New client connected from address ${address}:${port}`);
+  onListen({ address }) {
+    console.info();
+    console.info(`${new Date().toLocaleString()} [${protocol.toUpperCase()} SERVER] Ready on ${address}`);
+  },
+
+  onClientConnection({ id, address, port }) {
+    console.debug(`${new Date().toLocaleString()} [${protocol.toUpperCase()} SERVER] New client ${id} connected from address ${address}:${port}`);
+  },
+
+  onClientDisconnection({ id }) {
+    console.debug(`${new Date().toLocaleString()} [${protocol.toUpperCase()} SERVER] Client ${id} has disconnected`);
   },
 
   onDebug(message) {
-    console.debug(`[${protocol.toUpperCase()} SERVER] ${message}`);
-  },
-
-  onListen({ address }) {
-    console.info(`[${protocol.toUpperCase()} SERVER] Ready on ${address}`);
+    // Enable to log debug messages
+    // console.debug(`${new Date().toLocaleString()} [${protocol.toUpperCase()} SERVER] ${message}`);
   },
 
   // UDP Events
-  onPacketDiscarded({ msgId }) {
-    console.debug(`[${protocol.toUpperCase()} SERVER] A packet with ID ${msgId} was received out-of-order and has been discarded`);
+  onPacketDiscarded({ packetId, currentClientPacketId }) {
+    console.debug(`${new Date().toLocaleString()} [${protocol.toUpperCase()} SERVER] A packet with ID ${packetId} was received out-of-order and has been discarded. Current packet sequence: ${currentClientPacketId}`);
   },
 
-  onPacketResend({ msgId }) {
-    console.debug(`[${protocol.toUpperCase()} SERVER] A packet with ID ${msgId} was not acked from the client and has been re-sent`);
+  onReliablePacketResend(resentPackets, totalReliablePackets, client) {
+    console.debug(`${new Date().toLocaleString()} [${protocol.toUpperCase()} SERVER] ${resentPackets.length} out of ${totalReliablePackets} reliable packets of the client ${client.id} have been resent`);
+  },
+
+  onReliablePacketDiscarded(packet) {
+    console.debug(`${new Date().toLocaleString()} [${protocol.toUpperCase()} SERVER] The reliable packet with ID ${packet.id} has not been acked from the client after some tempts and has been discarded`);
   }
 });

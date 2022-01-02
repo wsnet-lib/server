@@ -25,5 +25,5 @@ exports.commandIds = {
   lobby_data: 22,
   ack: 23,
   ping: 24,
-  pong: 25
+  disconnect: 25
 };

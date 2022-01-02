@@ -4,7 +4,7 @@ const { errors } = require('../lib/errors');
  * Send or broadcast a generic message
  */
 exports.handler = (ctx) => {
-  const { onGameMessage, data, lobby, state, client, sendError } = ctx;
+  const { onGameMessage, data, lobby, state, client, sendError, udpHeaderSize } = ctx;
 
   // Get the input
   const receiverId = data[1];
@@ -38,6 +38,11 @@ exports.handler = (ctx) => {
 
     // If the receiver does not exists anymore, send an error to the sender
     if (!receiverPlayer) return sendError(errors.playerNotFound);
+
+    // Remove the reliable flag (for UDP)
+    if (udpHeaderSize) {
+      response[response.byteLength - 1] = 0;
+    }
 
     // Send the message to the receiver
     receiverPlayer.send(response);

@@ -4,25 +4,26 @@
 module.exports = ({ server, options }) => {
   const onDebug = options.onDebug || console.debug;
   const onServerError = options.onServerError || console.error;
+  const pongDisconnectTimer = options.pongDisconnectTimer || 1000;
 
   // Ping handler
   const interval = setInterval(() => {
+    const now = +new Date();
     for (const client of server.clients) {
-      if (!client.isAlive) {
-        onDebug(`Pong event not received from client ${client.state.ip}, gracefully closing its connection`);
-        client.close();
+      if (client.closed) continue;
+
+      if (now - client.isAliveAt > pongDisconnectTimer) {
+        onDebug(`Pong messages not received from client ${client.state.ip}`);
+        if (!client.closed) client.close();
         continue;
       }
 
-      // Only send a ping to this client if the server is not already waiting for the pong
-      if (!client.pinged) {
-        client.isAlive = false;
-        onDebug(`Sending ping message to the client ${client.state.ip}`);
+      if (server.protocol !== 'UDP') {
+        onDebug(`◯ 🡆  Sending ping to client ${client.state.ip}`);
         client.ping();
-        client.pinged = true;
       }
     }
-  }, options.pingInterval || 3000);
+  }, options.pingInterval || 1000);
 
   server.on('close', () => {
     console.log('ON CLOSE');

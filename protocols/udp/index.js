@@ -31,28 +31,26 @@ exports.start = (options = {}) => {
   const discardOutOfOrderPackets = options.discardOutOfOrderPackets !== false;
 
   server = udp.createSocket('udp4');
-
-  // Reliable packets map
-  const reliablePackets = (server.reliablePackets = {});
+  server.protocol = 'UDP';
 
   // Connected clients
   server.clients = [];
   const clients = {};
 
   server.on('message', (data, info) => {
-    const clientId = shortHash(info.address);
+    const clientId = shortHash(info.address + ':' + info.port);
     let client = clients[clientId];
 
     // NEW CONNECTION: Create the client if this is its first message
-    if (!client || client.port !== info.port) {
+    if (!client) {
       client = new EventEmitter();
       client.id = clientId;
       client.address = info.address;
       client.port = info.port;
-      client.isAlive = true;
-      client.pinged = true; // If a ping has been sent to the client
+      client.isAliveAt = +new Date();
       client.clientPacketId = 0; // Sequence of messages sent from the client
       client.serverPacketId = 0; // Sequence of messages sent from the server
+      client.reliablePackets = {}; // Reliable packets map
 
       /**
        * Client player state
@@ -67,11 +65,12 @@ exports.start = (options = {}) => {
        * @param {Buffer} buffer
        */
       client.send = (buffer) => {
-        if (buffer[buffer.byteLength - 1]) {
-          reliablePackets[buffer.readUInt32LE(buffer.byteLength - 5)] = {
+        if (buffer[buffer.byteLength - 1] === 2) {
+          const packetId = buffer.readUInt32LE(buffer.byteLength - 5);
+          client.reliablePackets[packetId] = {
+            id: packetId,
             buffer,
-            address: client.address,
-            port: client.port,
+            client,
             sentAt: +new Date(),
             tempts: 0
           };
@@ -91,21 +90,23 @@ exports.start = (options = {}) => {
         server.send(buffer, client.port, client.address);
       };
 
+      // Handle the client disconnection
+      client.on('close', () => {
+        client.closed = true;
+
+        // Remove the player from the lobby (if auto-reconnection is not enabled)
+        !autoReconnectPlayers && client.state.lobby && removePlayer(client, 5);
+
+        // Remove the client from the connected clients
+        server.clients.splice(server.clients.findIndex(client => client.id === clientId), 1);
+        delete clients[clientId];
+        onClientDisconnection && onClientDisconnection(client);
+      });
+
       /**
        * Disconnect the player with a close event
        */
       client.close = () => client.emit('close');
-
-      // Handle the client disconnection
-      client.on('close', () => {
-        // Remove the player from the lobby (if auto-reconnection is not enabled)
-        !autoReconnectPlayers && client.state.lobby && removePlayer(client.state);
-
-        // Remove the client from the connected clients
-        server.clients.splice(server.clients.findIndex(client => client.id === clientId));
-        delete clients[clientId];
-        onClientDisconnection && onClientDisconnection(client);
-      });
 
       server.clients.push(client);
       clients[clientId] = client;
@@ -124,8 +125,9 @@ exports.start = (options = {}) => {
     // Ack the client message when requested
     if (reliable === 1) {
       const replyBuffer = Buffer.allocUnsafe(data.byteLength);
-      data.copy(replyBuffer, 0, 0, data.byteLength - 1);
+      data.copy(replyBuffer, 0, 0, data.byteLength);
       replyBuffer[0] = commandIds.ack;
+      replyBuffer[data.byteLength - 1] = 0;
       server.send(replyBuffer, client.port, client.address);
     }
 

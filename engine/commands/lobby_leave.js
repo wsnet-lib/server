@@ -4,12 +4,12 @@ const { removePlayer } = require('../models/lobby');
 /**
  * Kick or ban a player
  */
-exports.handler = ({ lobby, state, sendConfirm, sendConfirmWithError }) => {
+exports.handler = ({ client, lobby, state, sendConfirm, sendConfirmWithError, udpHeaderSize }) => {
   // Lobby check
   if (!lobby) return sendConfirmWithError(errors.lobbyNotFound);
 
   // Remove the player from the lobby
-  if (!removePlayer(state)) return sendConfirmWithError(errors.playerNotFound);
+  if (!removePlayer(client, udpHeaderSize)) return sendConfirmWithError(errors.playerNotFound);
 
   // Send the confirmation to the sender
   sendConfirm();

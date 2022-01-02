@@ -1,4 +1,5 @@
 const Quicksort = require('optimized-quicksort');
+const { appendUdpHeader } = require('../lib/appendUdpHeader');
 const { commandIds } = require('../lib/commandIds');
 const { resetLobbyState } = require('./player');
 
@@ -100,10 +101,12 @@ exports.findLobby = (dateSort, maxPlayersSort, ip) => {
 
 /**
  * Handle the player disconnection
- * @param {Player.State} state
+ * @param {Client} client
+ * @param {Number} [udpHeaderSize]
  * @return {Boolean}
  */
-exports.removePlayer = (state) => {
+exports.removePlayer = (client, udpHeaderSize) => {
+  const { state } = client;
   const { lobby, id: playerId } = state;
   const { players } = lobby;
   const playerLobbyIdx = players.findIndex(player => player.state.id === playerId);
@@ -127,10 +130,11 @@ exports.removePlayer = (state) => {
 
   // Broadcast the removed player to all the other lobby players
   if (!deletedLobby) {
-    const response = Buffer.allocUnsafe(3);
+    const response = Buffer.allocUnsafe(3 + udpHeaderSize);
     response[0] = commandIds.lobby_player_left;
     response[1] = playerId;
     response[2] = lobby.adminId;
+    if (udpHeaderSize) appendUdpHeader(client, response);
 
     for (let i = 0, len = players.length; i < len; i++) {
       players[i].send(response);
