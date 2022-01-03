@@ -58,5 +58,6 @@ interface Input {
 
 interface ReceiverOutput {
   commandId           u8
+  senderId            u8
   payload             any
 */

@@ -4,7 +4,7 @@
 module.exports = ({ server, options }) => {
   const onDebug = options.onDebug || console.debug;
   const onServerError = options.onServerError || console.error;
-  const pongDisconnectTimer = options.pongDisconnectTimer || 1000;
+  const pongDisconnectTimer = options.pongDisconnectTimer || 10000;
 
   // Ping handler
   const interval = setInterval(() => {

@@ -18,8 +18,8 @@ start({
     console.info(`${new Date().toLocaleString()} [${protocol.toUpperCase()} SERVER] Ready on ${address}`);
   },
 
-  onClientConnection({ id, address, port }) {
-    console.debug(`${new Date().toLocaleString()} [${protocol.toUpperCase()} SERVER] New client ${id} connected from address ${address}:${port}`);
+  onClientConnection({ id }) {
+    console.debug(`${new Date().toLocaleString()} [${protocol.toUpperCase()} SERVER] Client ${id} has connected`);
   },
 
   onClientDisconnection({ id }) {
