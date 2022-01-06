@@ -28,7 +28,7 @@ start({
 
   onDebug(message) {
     // Enable to log debug messages
-    // console.debug(`${new Date().toLocaleString()} [${protocol.toUpperCase()} SERVER] ${message}`);
+    console.debug(`${new Date().toLocaleString()} [${protocol.toUpperCase()} SERVER] ${message}`);
   },
 
   // UDP Events

@@ -1,4 +1,6 @@
-app = "muddy-hill-983"
+# fly.toml file generated for udp-test-1 on 2022-01-04T18:05:37+01:00
+
+app = "udp-test-1"
 
 kill_signal = "SIGINT"
 kill_timeout = 300
@@ -6,11 +8,11 @@ processes = []
 
 [env]
   ADDRESS = "fly-global-services"
-  PORT = 53
+  PORT = 8080
 
 [[services]]
-  internal_port = 53
+  internal_port = 8080
   protocol = "udp"
 
   [[services.ports]]
-    port = "53"
+    port = "8080"

@@ -5,7 +5,8 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 
-EXPOSE 53
+ENV ADDRESS=fly-global-services
+EXPOSE 8080
 CMD [ "node", "index.js", "--udp" ]
 
 USER root

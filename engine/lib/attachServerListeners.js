@@ -13,7 +13,7 @@ module.exports = ({ server, options }) => {
       if (client.closed) continue;
 
       if (now - client.isAliveAt > pongDisconnectTimer) {
-        onDebug(`Pong messages not received from client ${client.state.ip}`);
+        onDebug(`Pings not received from client ${client.state.ip}`);
         if (!client.closed) client.close();
         continue;
       }

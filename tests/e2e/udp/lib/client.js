@@ -65,7 +65,7 @@ exports.UdpClient = class UdpClient {
   }
 
   __ping() {
-    if (+new Date() - this.__lastServerPong > 5000) {
+    if (+new Date() - this.__lastServerPong > 10000) {
       return console.log('ERROR: Connection to the server lost');
     }
     const buffer = new NetBuffer(1 + udpHeaderSize);

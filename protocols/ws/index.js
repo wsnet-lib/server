@@ -27,7 +27,7 @@ exports.start = (options = {}) => {
   const autoReconnectPlayers = options.autoReconnectPlayers === 'true';
 
   server = new WebSocket.Server({
-    port: options.port || 8080
+    port: options.port ?? 8080
   });
 
   server.on('connection', (client, req) => {

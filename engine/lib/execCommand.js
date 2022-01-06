@@ -11,7 +11,7 @@ const { createNetBuffer } = require('./buffer');
  * @param {Buffer} data
  * @param {Function} onGameMessage
  */
-exports.execCommand = ({ server, client, data, onGameMessage, packetId, reliable }, options = {}) => {
+exports.execCommand = ({ server, client, data, onGameMessage, packetId }, options = {}) => {
   client.isAliveAt = +new Date();
   const commandId = data[0];
   const command = commandHandlers[commandId];

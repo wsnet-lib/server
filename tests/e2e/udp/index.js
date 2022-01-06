@@ -4,7 +4,12 @@ const { Lobby } = require('./lib/lobby');
 const udpClient = new UdpClient();
 const lobby = new Lobby(udpClient);
 
-udpClient.listen('localhost', 8080, () => {
+// const address = 'localhost';
+// const port = 8080;
+const address = 'muddy-hill-983.fly.dev';
+const port = 53;
+
+udpClient.listen(address, port, () => {
   console.log();
   console.log(`Connected to the UDP server ${udpClient.address}:${udpClient.port}`);
 

@@ -22,10 +22,12 @@ exports.getServer = () => server;
  * @param {Object=} options
  */
 exports.start = (options = {}) => {
-  const port = options.port || 8080;
+  const address = options.address ?? '0.0.0.0';
+  const port = options.port ?? 8080;
   const onClientConnection = options.onClientConnection;
   const onClientDisconnection = options.onClientDisconnection;
   const onGameMessage = options.onGameMessage;
+  const onDebug = options.onDebug || console.debug;
   const onPacketDiscarded = options.onPacketDiscarded;
   const autoReconnectPlayers = options.autoReconnectPlayers;
   const discardOutOfOrderPackets = options.discardOutOfOrderPackets !== false;
@@ -38,6 +40,7 @@ exports.start = (options = {}) => {
   const clients = {};
 
   server.on('message', (data, info) => {
+    console.log(data, info);
     const clientId = shortHash(info.address + ':' + info.port);
     let client = clients[clientId];
 
@@ -118,6 +121,10 @@ exports.start = (options = {}) => {
 
     // Get the message ID and reliable flag
     const msgByteLength = data.byteLength;
+    if (msgByteLength < 6) {
+      return onDebug('Error decoding the incoming packet: invalid buffer size');
+    }
+
     const cmdId = data[0];
     const packetId = data.readUInt32LE(msgByteLength - 5);
     const reliable = data.readUInt8(msgByteLength - 1);
@@ -147,5 +154,5 @@ exports.start = (options = {}) => {
   attachServerListeners({ server, options });
   manageReliablePackets({ server, options });
 
-  server.bind(port);
+  server.bind(port, address);
 };
