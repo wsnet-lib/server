@@ -8,7 +8,7 @@ const attachServerListeners = require('../../engine/lib/attachServerListeners');
 const { execCommand } = require('../../engine/lib/execCommand');
 const { manageReliablePackets } = require('./manageReliablePackets');
 const { sendLobbyDataBuffer } = require('../../engine/lib/sendLobbyDataBuffer');
-const { appendUdpHeader } = require('../../engine/lib/appendUdpHeader');
+const { createNetBuffer } = require('../../engine/lib/buffer');
 
 /** @type {udp.Socket} */
 let server;
@@ -40,9 +40,15 @@ exports.start = (options = {}) => {
   const clients = {};
 
   server.on('message', (data, info) => {
-    console.log(data, info);
     const clientId = shortHash(info.address + ':' + info.port);
     let client = clients[clientId];
+
+    /**
+     * Create a wrapper for the buffer creation and ready to be sent
+     * @param {Integer} size Buffer size
+     * @param {Integer} [reliable] Reliable flag
+     */
+    const createBuffer = (size, reliable = 2) => createNetBuffer(client, null, size, reliable);
 
     // NEW CONNECTION: Create the client if this is its first message
     if (!client) {
@@ -116,7 +122,7 @@ exports.start = (options = {}) => {
       onClientConnection && onClientConnection(client);
 
       // Send the initial event "lobby_data"
-      autoReconnectPlayers && sendLobbyDataBuffer({ client, udpHeaderSize: 5, appendUdpHeader });
+      sendLobbyDataBuffer({ client, createBuffer });
     }
 
     // Get the message ID and reliable flag

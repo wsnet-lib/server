@@ -30,7 +30,6 @@ exports.manageReliablePackets = ({ server, options }) => {
           packet.tempts++;
           delete reliablePackets[packetId];
           server.send(packet.buffer, client.port, client.address);
-          console.log('resend', client.id);
         }
       }
 
