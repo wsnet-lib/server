@@ -1,10 +1,11 @@
 {
-  "name": "gws-server",
-  "version": "1.0.0",
+  "name": "wsnet-server",
+  "version": "2.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node .",
+    "start:udp": "node . --udp",
     "watch": "nodemon -q"
   },
   "engines": {
@@ -17,9 +18,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gamemakernet/test"
+    "url": "https://github.com/wsnet-lib/server"
   },
   "dependencies": {
+    "nanoid": "^3.1.30",
     "optimized-quicksort": "1.1.1",
     "short-hash": "^1.0.0",
     "ws": "7.2.1"
