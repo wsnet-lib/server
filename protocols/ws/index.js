@@ -46,7 +46,7 @@ exports.start = (options = {}) => {
     client.isAliveAt = +new Date();
 
     client.on('pong', () => {
-      onDebug(`Received pong event from client ${client.state.ip}`);
+      onDebug(`🡄 ⬤  Received pong event from client ${client.state.ip}`);
       client.isAliveAt = +new Date();
     });
 
