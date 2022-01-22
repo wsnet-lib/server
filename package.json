@@ -21,7 +21,7 @@
     "url": "https://github.com/wsnet-lib/server"
   },
   "dependencies": {
-    "nanoid": "^3.1.30",
+    "nanoid": "^3.1.31",
     "optimized-quicksort": "1.1.1",
     "short-hash": "^1.0.0",
     "ws": "7.2.1"
