@@ -146,7 +146,7 @@ exports.start = (options = {}) => {
 
     if (cmdId !== commandIds.ack) {
       // Discard out-of-order packets
-      if (discardOutOfOrderPackets && packetId < client.clientPacketId) {
+      if (discardOutOfOrderPackets && packetId < client.clientPacketId && !reliable) {
         return onPacketDiscarded && onPacketDiscarded({ packetId, currentClientPacketId: client.clientPacketId });
       }
 
